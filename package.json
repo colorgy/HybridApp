@@ -15,6 +15,7 @@
   "dependencies": {
     "babel-core": "^5.8.22",
     "react": "^0.13.3",
+    "react-router": "^0.13.3",
     "reapp": "^0.8.28"
   }
 }

@@ -1,6 +1,8 @@
 import React from 'react';
+import Router from 'react-router';
 
-React.render(
-  <p>Hello World!</p>,
-  document.getElementById('app')
-);
+import routes from './routes';
+
+Router.run(routes, Router.HistoryLocation, (Root) => {
+  React.render(<Root/>, document.getElementById('app'));
+});
