@@ -6,3 +6,6 @@ node_modules
 server_modules
 ncp-debug.log
 npm-debug.log
+
+cordova/platforms
+cordova/plugins
