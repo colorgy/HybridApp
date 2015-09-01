@@ -1,10 +1,13 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import appTabSelector from '../selectors/appTabSelector';
+import { appTabChange } from '../actions/appTabActions.js';
 import { Tabs, Tab, Styles } from 'material-ui';
 
 let ThemeManager = new Styles.ThemeManager();
 let { Colors } = Styles;
 
-export default React.createClass({
+var AppTabs = React.createClass({
   contextTypes: {
     router: React.PropTypes.func
   },
@@ -41,11 +44,12 @@ export default React.createClass({
   ],
 
   getTabs() {
-    return this.tabs.map( (tab) => {
+    return this.tabs.map( (tab, i) => {
       let style = { color: Styles.Colors.grey900 };
       return (
         <Tab
           key={tab.route}
+          index={i}
           label={tab.text}
           route={tab.route}
           style={style}
@@ -80,5 +84,8 @@ export default React.createClass({
 
   _onTabActive(tab){
     this.context.router.transitionTo(tab.props.route);
+    this.props.dispatch(appTabChange(tab.props.index));
   }
 });
+
+export default connect(appTabSelector)(AppTabs);
