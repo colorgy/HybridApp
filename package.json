@@ -4,9 +4,17 @@
   "description": "Colorgy Hybrid App",
   "private": true,
   "main": "app/app.js",
+  "reapp": "0.8",
   "scripts": {
+    "start": "reapp-run",
+    "build": "reapp-build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "babel-core": "^5.8.22",
+    "react": "^0.13.3",
+    "reapp": "^0.8.28"
+  }
 }
