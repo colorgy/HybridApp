@@ -1,9 +1,12 @@
 import React from 'react';
+import PageWithNav from './PageWithNav';
 
 export default React.createClass({
   render() {
     return (
-      <p>About us.</p>
+      <PageWithNav style={this.props.style}>
+        <p>About us.</p>
+      </PageWithNav>
     );
   }
 });
