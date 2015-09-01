@@ -1,0 +1,38 @@
+#!/bin/sh
+set -e
+
+TARGET="$1"
+
+cd "$(dirname "$0")/.."
+
+case "$TARGET" in
+  'web')
+    echo 'Start building web app...'
+    reapp-build web
+    ;;
+  'ios')
+    echo 'Start building iOS app...'
+    reapp-build cordova
+    cd cordova
+    cordova prepare
+    cordova build ios
+    cd ..
+    ;;
+  'android')
+    echo 'Start building Android app...'
+    reapp-build cordova
+    cd cordova
+    cordova prepare
+    cordova build android
+    cd ..
+    ;;
+  *)
+    echo 'Start building app...'
+    reapp-build cordova
+    cd cordova
+    cordova prepare
+    cordova build ios
+    cordova build android
+    cd ..
+    ;;
+esac

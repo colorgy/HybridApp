@@ -7,7 +7,7 @@
   "reapp": "0.8",
   "scripts": {
     "start": "reapp-run",
-    "build": "reapp-build",
+    "build": "./bin/build $1",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
