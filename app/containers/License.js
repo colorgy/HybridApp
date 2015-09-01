@@ -1,5 +1,5 @@
 import React from 'react';
-import PageWithNav from './PageWithNav';
+import PageWithNav from '../components/PageWithNav';
 
 export default React.createClass({
   render() {

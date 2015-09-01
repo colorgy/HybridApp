@@ -1,11 +1,14 @@
 import React from 'react';
-import { RouteHandler, Link } from 'react-router';
+import { connect } from 'react-redux';
+import appTabSelector from '../selectors/appTabSelector';
 import { AppCanvas, AppBar, LeftNav, MenuItem, Tabs, Tab } from 'material-ui';
 import AppNav from './AppNav';
-import AppTabs from './AppTabs';
+import AppTab from './AppTab';
 import ThemeManager from '../theme/ThemeManager';
+import About from './About';
+import License from './License';
 
-export default React.createClass({
+var App = React.createClass({
   contextTypes: {
     router: React.PropTypes.func
   },
@@ -32,9 +35,19 @@ export default React.createClass({
     }
   },
 
-
   render() {
     var barStyle = this.getBarStyle();
+
+    var currentTab = null;
+    switch (this.props.appTabIndex) {
+      case 0:
+        currentTab = <About/>
+        break;
+      case 1:
+        currentTab = <License/>
+        break;
+    }
+
     return (
       <AppCanvas>
 
@@ -47,9 +60,9 @@ export default React.createClass({
           iconClassNameRight="muidocs-icon-navigation-expand-more"
           style={barStyle} />
 
-        <RouteHandler/>
+        {currentTab}
 
-        <AppTabs/>
+        <AppTab/>
       </AppCanvas>
     );
   },
@@ -58,3 +71,5 @@ export default React.createClass({
     this.refs.appNav.refs.nav.toggle();
   }
 });
+
+export default connect(appTabSelector)(App);

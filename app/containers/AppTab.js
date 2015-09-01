@@ -83,7 +83,6 @@ var AppTabs = React.createClass({
   },
 
   _onTabActive(tab){
-    this.context.router.transitionTo(tab.props.route);
     this.props.dispatch(appTabChange(tab.props.index));
   }
 });

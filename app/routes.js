@@ -1,9 +1,9 @@
 import React from 'react';
 import { Route } from 'react-router';
 
-import App from './components/App';
-import About from './components/About';
-import License from './components/License';
+import App from './containers/App';
+import About from './containers/About';
+import License from './containers/License';
 
 export default (
   <Route handler={App}>
