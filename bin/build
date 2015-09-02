@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 TARGET="$1"
 
@@ -14,6 +13,7 @@ case "$TARGET" in
     echo 'Start building iOS app...'
     reapp-build cordova
     cd cordova
+    cordova platform add ios
     cordova prepare
     cordova build ios
     cd ..
@@ -22,6 +22,7 @@ case "$TARGET" in
     echo 'Start building Android app...'
     reapp-build cordova
     cd cordova
+    cordova platform add android
     cordova prepare
     cordova build android
     cd ..
@@ -30,6 +31,8 @@ case "$TARGET" in
     echo 'Start building app...'
     reapp-build cordova
     cd cordova
+    cordova platform add ios
+    cordova platform add android
     cordova prepare
     cordova build ios
     cordova build android

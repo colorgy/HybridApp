@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="io.colorgy.cordova.colorgy" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="io.colorgy.app" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Colorgy</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        Colorgy App.
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+    <author email="hello@colorgy.io" href="https://colorgy.io">
+        Colorgy Team
     </author>
     <content src="index.html" />
     <plugin name="cordova-plugin-whitelist" version="1" />
@@ -16,6 +16,10 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    <allow-navigation href="*://colorgy.io/*" />
+    <allow-navigation href="*://*.colorgy.io/*" />
+    <allow-navigation href="*://*.clg.io/*" />
+    <allow-navigation href="data:*" />
     <platform name="android">
         <allow-intent href="market:*" />
     </platform>

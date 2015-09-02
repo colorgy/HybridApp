@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import appTabSelector from '../selectors/appTabSelector';
 import appUserSelector from '../selectors/appUserSelector';
+import { logout } from '../actions/appUserActions';
 import { AppCanvas, AppBar, LeftNav, MenuItem, Tabs, Tab } from 'material-ui';
 import Login from './Login';
 import AppNav from './AppNav';
@@ -9,6 +10,7 @@ import AppTab from './AppTab';
 import ThemeManager from '../theme/ThemeManager';
 import About from './About';
 import License from './License';
+import LogoutDialog from '../components/LogoutDialog';
 
 var App = React.createClass({
   contextTypes: {
@@ -27,7 +29,7 @@ var App = React.createClass({
 
   getBarStyle() {
     if (typeof cordova !== 'undefined' && cordova.platformId == 'ios') {
-      var paddingTop = '20px';
+      var paddingTop = '18px';
     } else {
       var paddingTop = 'auto';
     }
@@ -55,7 +57,8 @@ var App = React.createClass({
         <AppCanvas>
 
           <AppNav
-            ref="appNav" />
+            ref="appNav"
+            handleLogout={this.handleLogout} />
 
           <AppBar
             title="Colorgy"
@@ -66,14 +69,25 @@ var App = React.createClass({
           {currentTab}
 
           <AppTab/>
+
+          <LogoutDialog
+            ref="logoutDialog"
+            handleLogout={() => this.props.dispatch(logout())} />
+
         </AppCanvas>
       );
 
     } else {
       return (
-        <Login />
+        <AppCanvas>
+          <Login />
+        </AppCanvas>
       );
     }
+  },
+
+  handleLogout() {
+    this.refs.logoutDialog.show();
   },
 
   _onLeftIconButtonTouchTap() {

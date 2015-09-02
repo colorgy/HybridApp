@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect';
 
-const appUserIsLoginSelector = state => ({ isLogin: state.appUser.isLogin });
+const appUserSelector = state => ({
+  ...state.appUser
+});
 
-export default appUserIsLoginSelector;
+export default appUserSelector;

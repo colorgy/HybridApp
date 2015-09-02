@@ -9,8 +9,7 @@ ThemeManager.setPalette({
   primary3Color: Colors.blue100,
   accent1Color: Colors.deepOrangeA200,
   accent2Color: Colors.deepOrangeA400,
-  accent3Color: Colors.deepOrangeA100,
-  canvasColor: Colors.grey200
+  accent3Color: Colors.deepOrangeA100
 });
 
 if (typeof cordova !== 'undefined' && cordova.platformId == 'android') {

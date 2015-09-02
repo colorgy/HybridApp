@@ -59,14 +59,7 @@ var AppTab = React.createClass({
   },
 
   getSelectedIndex() {
-    let selectedIndex = 0;
-
-    for (let tab of this.tabs) {
-      if (tab.route && this.context.router.isActive(tab.route)) break;
-      selectedIndex++;
-    }
-
-    return selectedIndex;
+    return this.props.appTabIndex;
   },
 
   render() {
