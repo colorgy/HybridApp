@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import appTabSelector from '../selectors/appTabSelector';
-import { appTabChange } from '../actions/appTabActions.js';
+import { appTabChange } from '../actions/appTabActions';
 import { Tabs, Tab, Styles } from 'material-ui';
 
 let ThemeManager = new Styles.ThemeManager();
 let { Colors } = Styles;
 
-var AppTabs = React.createClass({
+var AppTab = React.createClass({
   contextTypes: {
     router: React.PropTypes.func
   },
@@ -87,4 +87,4 @@ var AppTabs = React.createClass({
   }
 });
 
-export default connect(appTabSelector)(AppTabs);
+export default connect(appTabSelector)(AppTab);

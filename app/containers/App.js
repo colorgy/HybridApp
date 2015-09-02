@@ -1,7 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import appTabSelector from '../selectors/appTabSelector';
+import appUserSelector from '../selectors/appUserSelector';
 import { AppCanvas, AppBar, LeftNav, MenuItem, Tabs, Tab } from 'material-ui';
+import Login from './Login';
 import AppNav from './AppNav';
 import AppTab from './AppTab';
 import ThemeManager from '../theme/ThemeManager';
@@ -48,28 +50,38 @@ var App = React.createClass({
         break;
     }
 
-    return (
-      <AppCanvas>
+    if (this.props.isLogin) {
+      return (
+        <AppCanvas>
 
-        <AppNav
-          ref="appNav" />
+          <AppNav
+            ref="appNav" />
 
-        <AppBar
-          title="Colorgy"
-          onLeftIconButtonTouchTap={this._onLeftIconButtonTouchTap}
-          iconClassNameRight="muidocs-icon-navigation-expand-more"
-          style={barStyle} />
+          <AppBar
+            title="Colorgy"
+            onLeftIconButtonTouchTap={this._onLeftIconButtonTouchTap}
+            iconClassNameRight="muidocs-icon-navigation-expand-more"
+            style={barStyle} />
 
-        {currentTab}
+          {currentTab}
 
-        <AppTab/>
-      </AppCanvas>
-    );
+          <AppTab/>
+        </AppCanvas>
+      );
+
+    } else {
+      return (
+        <Login />
+      );
+    }
   },
 
   _onLeftIconButtonTouchTap() {
-    this.refs.appNav.refs.nav.toggle();
+    this.refs.appNav.refs.wrappedInstance.toggle();
   }
 });
 
-export default connect(appTabSelector)(App);
+export default connect(state => ({
+  isLogin: state.appUser.isLogin,
+  appTabIndex: state.appTab.appTabIndex
+}))(App);
