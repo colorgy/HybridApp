@@ -5,6 +5,10 @@ import store from '../store';
 import { refreshAccessToken, accessTokenRefreshed, logout } from '../actions/appUserActions';
 
 const baseURL = colorgyOAuth2.baseURL;
+var colorgyAPI = {
+  requestQueneLength: 0,
+  accessTokenRefreshing: false
+};
 
 function getAccessToken() {
   var appUser = store.getState().appUser;
@@ -13,7 +17,7 @@ function getAccessToken() {
 }
 
 // get the access token (and automatically refresh if expired), returns an promise
-function requestAccessToken() {
+function requestAccessToken(forceRefresh = false) {
   return new Promise( (resolve, reject) => {
     var appUser = store.getState().appUser;
     var accessToken = appUser && appUser.accessToken && colorgyOAuth2.createToken(appUser.accessToken);
@@ -24,8 +28,9 @@ function requestAccessToken() {
       reject();
 
     // if the access token is going to expire
-    } else if (parseInt((accessToken.expires.getTime() - (new Date()).getTime()) / 1000) < 60) {
+    } else if ((forceRefresh || parseInt((accessToken.expires.getTime() - (new Date()).getTime()) / 1000) < 600 && colorgyAPI.requestQueneLength <= 1 || parseInt((accessToken.expires.getTime() - (new Date()).getTime()) / 1000) < 120) && !colorgyAPI.accessTokenRefreshing) {
       console.log('colorgyAPI.requestAccessToken: Access token expired, refreshing...');
+      colorgyAPI.accessTokenRefreshing = true;
       store.dispatch(refreshAccessToken());
 
       accessToken.refresh().then( token => {
@@ -37,12 +42,18 @@ function requestAccessToken() {
           scope: null,
           created_at: null
         }));
+        colorgyAPI.accessTokenRefreshing = false;
         resolve(accessToken);
       }).catch( e => {
         console.error('colorgyAPI.requestAccessToken: Error: Access token refreshing faild.', e);
-        appUser = store.getState().appUser;
-        accessToken = appUser && appUser.accessToken && colorgyOAuth2.createToken(appUser.accessToken);
-        resolve(accessToken);
+        colorgyAPI.accessTokenRefreshing = false;
+        if (e.body && e.body.error == 'invalid_grant') {
+          reject(e.body);
+        } else {
+          appUser = store.getState().appUser;
+          accessToken = appUser && appUser.accessToken && colorgyOAuth2.createToken(appUser.accessToken);
+          resolve(accessToken);
+        }
       });
 
     // or just return the token
@@ -59,12 +70,52 @@ function colorgyRequest(request) {
     }
   }
 
-  var getAccessToken = requestAccessToken();
-  var sendRequest = getAccessToken.then( (accessToken) => accessToken.request(request) );
+  var sendRequest = requestAccessToken().then( (accessToken) => {
+    colorgyAPI.requestQueneLength += 1;
+    return accessToken.request(request);
+  }).then( (respond) => {
+    if (respond.status == 401) {
+      console.warn('colorgyAPI.request: 401: retrying');
+      return requestAccessToken().then(
+        (accessToken) => accessToken.request(request)
+      ).then( (respond) => {
+        if (respond.status == 401) {
+          console.warn('colorgyAPI.request: double 401: retrying with force access token refresh');
+          return requestAccessToken(true).then( (accessToken) => {
+            colorgyAPI.requestQueneLength -= 1;
+            return accessToken.request(request);
+          }, (error) => {
+            colorgyAPI.requestQueneLength -= 1;
+            console.error('Access Token Refresh Faild, Authentication Lost!');
+          });
+        } else {
+          colorgyAPI.requestQueneLength -= 1;
+          return respond;
+        }
+      });
+    } else {
+      colorgyAPI.requestQueneLength -= 1;
+      return respond;
+    }
+  }).catch( (error) => {
+    console.warn('colorgyAPI.request: retrying');
+    return requestAccessToken().then( (accessToken) => {
+      colorgyAPI.requestQueneLength -= 1;
+      return accessToken.request(request);
+    }, (error) => {
+      colorgyAPI.requestQueneLength -= 1;
+      console.error('Access Token Refresh Faild, Authentication Lost!');
+    });
+  }).catch( (error) => {
+    colorgyAPI.requestQueneLength -= 1;
+    throw error;
+  });
+
   return sendRequest;
 }
 
-var colorgyAPI = {
+colorgyAPI = {
+  ...colorgyAPI,
   baseURL: baseURL,
   request: colorgyRequest,
   getAccessToken: getAccessToken,
