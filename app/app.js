@@ -9,9 +9,8 @@ window.injectTapEventPlugin = require("react-tap-event-plugin");
 injectTapEventPlugin();
 
 import './theme';
-import routes from './routes';
+import App from './containers/App';
 
-Router.run(routes, Router.HashLocation, (Root) => {
-  React.render(<Provider store={store}>{() => <Root/>}</Provider>, document.getElementById('app'));
-});
+React.render(<Provider store={store}>{() => <App/>}</Provider>, document.getElementById('app'));
+
 

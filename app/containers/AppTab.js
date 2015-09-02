@@ -28,6 +28,10 @@ var AppTab = React.createClass({
       primary1Color: Colors.grey100,
       accent1Color: Colors.deepOrangeA200
     });
+
+    if (window && window.history) {
+      window.history.replaceState({ appTabIndex: this.props.appTabIndex }, 'page');
+    }
   },
 
   style: {
@@ -39,8 +43,10 @@ var AppTab = React.createClass({
   },
 
   tabs: [
-    { route: 'about', text: 'About' },
-    { route: 'license', text: 'License' }
+    { name: 'table', text: 'Table' },
+    { name: 'chat', text: 'Chat' },
+    { name: 'about', text: 'About' },
+    { name: 'license', text: 'License' }
   ],
 
   getTabs() {
