@@ -35,6 +35,7 @@ var Login = React.createClass({
           </CardText>
           <CardActions>
             <FlatButton label="登入" primary={true} onTouchTap={this._handleLogin} />
+            <FlatButton label="FB 登入" primary={true} onTouchTap={this._handleFBLogin} />
           </CardActions>
         </Card>
 
@@ -58,6 +59,22 @@ var Login = React.createClass({
     var password = this.refs.password.getValue();
 
     this.props.dispatch(login({ username: username, password: password }));
+  },
+
+  _handleFBLogin() {
+    var dispatch = this.props.dispatch;
+
+    facebookConnectPlugin.login(['public_profile', 'email', 'user_birthday', 'user_friends'],
+      function (data) {
+        var username = 'facebook:access_token';
+        var password = data.authResponse.accessToken;
+
+        dispatch(login({ username: username, password: password }));
+      },
+      function (error) {
+        alert('Error: ' + error);
+      }
+    );
   }
 
 });
