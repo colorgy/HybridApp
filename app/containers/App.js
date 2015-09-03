@@ -30,18 +30,6 @@ var App = React.createClass({
     };
   },
 
-  getBarStyle() {
-    if (typeof cordova !== 'undefined' && cordova.platformId == 'ios') {
-      var paddingTop = '18px';
-    } else {
-      var paddingTop = 'auto';
-    }
-
-    return {
-      paddingTop: paddingTop
-    }
-  },
-
   getTabStyle(tabIndex) {
     if (this.props.appTabIndex == tabIndex) {
       return {};
@@ -51,6 +39,8 @@ var App = React.createClass({
   },
 
   componentWillMount() {
+    if (window) window.toggleAppNav = this.toggleAppNav;
+
     document.addEventListener("deviceready", onDeviceReady, false);
 
     function onDeviceReady() {
@@ -70,7 +60,6 @@ var App = React.createClass({
   },
 
   render() {
-    var barStyle = this.getBarStyle();
 
     if (this.props.isLogin) {
 
@@ -80,12 +69,6 @@ var App = React.createClass({
           <AppNav
             ref="appNav"
             handleLogout={this.handleLogout} />
-
-          <AppBar
-            title="Colorgy"
-            onLeftIconButtonTouchTap={this._onLeftIconButtonTouchTap}
-            iconClassNameRight="muidocs-icon-navigation-expand-more"
-            style={barStyle} />
 
           <div style={this.getTabStyle(0)}>
             <Table/>
@@ -122,7 +105,7 @@ var App = React.createClass({
     this.refs.logoutDialog.show();
   },
 
-  _onLeftIconButtonTouchTap() {
+  toggleAppNav() {
     this.refs.appNav.refs.wrappedInstance.toggle();
   }
 });
