@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { RaisedButton } from 'material-ui';
+import tableActions from '../actions/tableActions';
 import PageRouter, { Route } from '../components/PageRouter';
 import Page from '../components/Page';
 import TablePage from './Table/TablePage';
