@@ -33,6 +33,7 @@
     "redux": "^1.0.1",
     "redux-actions": "^0.7.0",
     "redux-localstorage": "^0.4.0",
+    "redux-logger": "^1.0.6",
     "redux-thunk": "^0.1.0",
     "reselect": "0.0.2",
     "sass-loader": "^2.0.1",
