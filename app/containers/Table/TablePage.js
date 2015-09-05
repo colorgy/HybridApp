@@ -1,10 +1,13 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { RaisedButton, IconButton, SvgIcon } from 'material-ui';
 import { pageNavigateTo, pageNavigateBack } from '../../components/PageRouter';
-import PageWithBar, { getBarHeight, getTabHeight } from '../../components/PageWithBar';
+import PageWithBar, { getBarHeight } from '../../components/PageWithBar';
+import { getAppTabHeight } from '../../containers/AppTab';
 import WeekTable from '../../components/WeekTable';
+import { doUpdateCourseDatabase } from '../../actions/tableActions';
 
-export default React.createClass({
+var TablePage = React.createClass({
 
   render() {
     var pageAction = (
@@ -18,12 +21,15 @@ export default React.createClass({
 
     return (
       <PageWithBar style={{ overflow: 'visiable' }} title={this.props.cid} actions={pageAction}>
-        <WeekTable style={{ position: 'absolute', top: getBarHeight(), bottom: getTabHeight(), width: '100%' }} />
+        <WeekTable style={{ position: 'absolute', top: getBarHeight(), bottom: getAppTabHeight(), width: '100%' }} />
       </PageWithBar>
     );
   },
 
   handleAdd() {
-    console.log('add');
+    this.props.dispatch(doUpdateCourseDatabase());
   }
 });
+
+export default connect(state => ({
+}))(TablePage);

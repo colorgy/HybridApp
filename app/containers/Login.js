@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { login } from '../actions/appUserActions';
+import { doLogin } from '../actions/appUserActions';
 import { Paper, Card, CardTitle, CardText, CardActions, FlatButton, RaisedButton, TextField, Snackbar } from 'material-ui';
+import CenteredPage from '../components/CenteredPage';
 
 var Login = React.createClass({
 
@@ -16,7 +17,7 @@ var Login = React.createClass({
     }
 
     return (
-      <div style={{ height: '100%', textAlign: 'center', display: '-webkit-flex', WebkitAlignItems: 'center', WebkitJustifyContent: 'center', backgroundColor: '#eee' }}>
+      <CenteredPage>
 
         <Card zDepth={1} style={{ display: 'block' }}>
           <CardTitle
@@ -46,7 +47,7 @@ var Login = React.createClass({
             message={errorMessage}
             autoHideDuration={4000} />
         </div>
-      </div>
+      </CenteredPage>
     );
   },
 
@@ -58,7 +59,7 @@ var Login = React.createClass({
     var username = this.refs.username.getValue();
     var password = this.refs.password.getValue();
 
-    this.props.dispatch(login({ username: username, password: password }));
+    this.props.dispatch(doLogin({ username: username, password: password }));
   },
 
   _handleFBLogin() {
@@ -69,7 +70,7 @@ var Login = React.createClass({
         var username = 'facebook:access_token';
         var password = data.authResponse.accessToken;
 
-        dispatch(login({ username: username, password: password }));
+        dispatch(doLogin({ username: username, password: password }));
       },
       function (error) {
         alert('Error: ' + error);

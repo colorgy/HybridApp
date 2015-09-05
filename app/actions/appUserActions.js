@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import colorgyAPI from '../utils/colorgyAPI';
+import courseDatabase from '../databases/courseDatabase';
 
 import { createAction } from 'redux-actions';
 
@@ -21,12 +22,13 @@ function convertImgToBase64URL(url, callback, outputFormat){
 
 export const loggingIn = createAction('LOGGING_IN');
 export const loginSuccess = createAction('LOGIN_SUCCESS');
+export const appUserInitialDataUpdateDone = createAction('APP_USER_INITIAL_DATA_UPDATE_DONE');
 export const loginFailed = createAction('LOGIN_FAILED');
 
 export const refreshAccessToken = createAction('REFRESH_ACCESS_TOKEN');
 export const accessTokenRefreshed = createAction('ACCESS_TOKEN_REFRESHED');
 
-export const login = userCredentials => dispatch => {
+export const doLogin = userCredentials => dispatch => {
   dispatch(loggingIn());
 
   let scopeString = 'public%20email%20account%20identity%20info%20write%20notifications%20notifications:send%20api%20api:write%20offline_access';
@@ -64,6 +66,7 @@ export const syncAppUserData = (initial = false) => dispatch => {
     dispatch(updateAppUserData(response.body));
     dispatch(downloadAppUserImage({ url: response.body.avatar_url, name: 'avatar' }));
     dispatch(downloadAppUserImage({ url: response.body.cover_photo_blur_url, name: 'coverPhoto' }));
+    dispatch(appUserInitialDataUpdateDone());
   });
 };
 
@@ -73,6 +76,11 @@ export const downloadAppUserImage = payload => dispatch => {
   convertImgToBase64URL(payload.url, (base64Image) => {
     dispatch(saveAppUserImage({ name: payload.name, image: base64Image }));
   })
+}
+
+export const doLogout = payload => dispatch => {
+  dispatch(logout());
+  courseDatabase.reset();
 }
 
 export const logout = createAction('LOGOUT');

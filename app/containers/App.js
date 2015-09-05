@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import appTabSelector from '../selectors/appTabSelector';
 import appUserSelector from '../selectors/appUserSelector';
-import { logout } from '../actions/appUserActions';
+import { doLogout } from '../actions/appUserActions';
 import { appPageBack } from '../actions/appPageActions';
 import { AppCanvas, AppBar, LeftNav, MenuItem, Tabs, Tab } from 'material-ui';
 import Login from './Login';
@@ -32,7 +32,7 @@ var App = React.createClass({
 
   getTabStyle(tabIndex) {
     if (this.props.appTabIndex == tabIndex) {
-      return {};
+      return { height: '100%' };
     } else {
       return { display: 'none' }
     }
@@ -87,7 +87,7 @@ var App = React.createClass({
 
           <LogoutDialog
             ref="logoutDialog"
-            handleLogout={() => this.props.dispatch(logout())} />
+            handleLogout={() => this.props.dispatch(doLogout())} />
 
         </AppCanvas>
       );

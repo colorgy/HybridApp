@@ -3,9 +3,14 @@ import { connect } from 'react-redux';
 import appTabSelector from '../selectors/appTabSelector';
 import { appTabChange } from '../actions/appTabActions';
 import { Tabs, Tab, Styles } from 'material-ui';
+let { Spacing } = Styles;
 
 let ThemeManager = new Styles.ThemeManager();
 let { Colors } = Styles;
+
+var getAppTabHeight = function () {
+  return Spacing.desktopKeylineIncrement - 20 + 'px';
+}
 
 var AppTab = React.createClass({
   contextTypes: {
@@ -87,3 +92,4 @@ var AppTab = React.createClass({
 });
 
 export default connect(appTabSelector)(AppTab);
+export { getAppTabHeight };

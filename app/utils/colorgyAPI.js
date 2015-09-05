@@ -114,12 +114,35 @@ function colorgyRequest(request) {
   return sendRequest;
 }
 
+function generateUuid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
+
+function getCurrentYear() {
+  var date = (new Date());
+  return ((date.getMonth() + 1 > 6) ? date.getFullYear() : date.getFullYear() - 1);
+}
+
+function getCurrentTerm() {
+  var date = (new Date());
+  return ((date.getMonth() + 1 > 6) ? 1 : 2);
+}
+
 colorgyAPI = {
   ...colorgyAPI,
   baseURL: baseURL,
   request: colorgyRequest,
   getAccessToken: getAccessToken,
-  requestAccessToken: requestAccessToken
+  requestAccessToken: requestAccessToken,
+  generateUuid: generateUuid,
+  getCurrentYear: getCurrentYear,
+  getCurrentTerm: getCurrentTerm
 };
 
 if (window) window.colorgyAPI = colorgyAPI;

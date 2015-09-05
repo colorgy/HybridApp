@@ -1,5 +1,7 @@
 import { handleActions } from 'redux-actions';
 
+var defaultState = { history: {}, currentAppTabIndex: 0 };
+
 export default handleActions({
   APP_PAGE_NAVIGATE: (state, action) => {
     var history = state.history;
@@ -79,5 +81,9 @@ export default handleActions({
       currentPath: currentPath,
       previousPath: previousPath
     };
+  },
+
+  LOGOUT: (state, action) => {
+    return defaultState;
   }
-}, { history: {}, currentAppTabIndex: 0 });
+}, defaultState);
