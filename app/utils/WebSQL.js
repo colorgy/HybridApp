@@ -19,8 +19,12 @@
 //  db.executeSql('SELECT * FROM users LEFT OUTER JOIN todos ON todos.user_id = users.id WHERE users.id = ?', [18]).then(function (result) { console.log(result.results); });
 
 class WebSQL {
-  constructor(name, displayName, size, migrations) {
-    this.db = window.openDatabase(name, '', displayName, size || 1024 * 1024);
+  constructor(name, displayName, size, migrations, provider = window, customConstructObject = null) {
+    if (customConstructObject) {
+      this.db = provider.openDatabase(customConstructObject);
+    } else {
+      this.db = provider.openDatabase(name, '', displayName, size || 1024 * 1024);
+    }
     this.dbName = name;
     this.migrations = migrations;
     let migrationKeys = Object.keys(migrations);
@@ -28,8 +32,8 @@ class WebSQL {
 
     this.executeSql("CREATE TABLE IF NOT EXISTS _db_info_(key CHAR(255) PRIMARY KEY, value TEXT)", null, false).then( (result) => {
       this.executeSql("SELECT * FROM _db_info_ WHERE key = 'schema_verison'", null, false).then( (result) => {
-        if (result.results.rows.length && result.results.rows[0]) {
-          this.version = result.results.rows[0].value;
+        if (result.results.rows.length && result.results.rows.item(0)) {
+          this.version = result.results.rows.item(0).value;
         }
       });
     });
@@ -105,7 +109,7 @@ class WebSQL {
         if (ensureMigrated) {
           if (this.version != this.migrationsLastVerison) {
             console.log(`WebSQL: ${this.dbName}: executeSql: Watitig for migration done...`)
-            if ((new Date()) - startedAt > 5000) {
+            if ((new Date()) - startedAt > 12000) {
               reject({ error: 'Migration Timeout' })
             } else {
               setTimeout(execute, 100)

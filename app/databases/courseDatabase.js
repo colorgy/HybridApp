@@ -7,7 +7,11 @@ var migartions = {
   '2.2': 'ALTER TABLE courses ADD COLUMN search_keywords TEXT;'
 }
 
-var courseDatabase = new WebSQL('course', 'course', 3*1024*1024, migartions);
+if (window.sqlitePlugin) {
+  var courseDatabase = new WebSQL(null, null, null, migartions, sqlitePlugin, { name: 'course.db', location: 2 });
+} else {
+  var courseDatabase = new WebSQL('course', 'course', 3*1024*1024, migartions);
+}
 
 courseDatabase.migrate();
 
