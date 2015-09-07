@@ -9,6 +9,8 @@ var migartions = {
 
 var courseDatabase = new WebSQL('course', 'course', 3*1024*1024, migartions);
 
+courseDatabase.migrate();
+
 window.courseDatabase = courseDatabase;
 
 export default courseDatabase;

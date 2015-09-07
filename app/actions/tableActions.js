@@ -3,8 +3,6 @@ import store from '../store';
 import colorgyAPI from '../utils/colorgyAPI';
 import courseDatabase from '../databases/courseDatabase';
 
-courseDatabase.migrate();
-
 export const checkCourseDatabaseDone = createAction('CHECK_COURSE_DATABASE_DONE');
 export const updateCourseDatabase = createAction('UPDATE_COURSE_DATABASE');
 export const courseDatabaseUpdated = createAction('COURSE_DATABASE_UPDATED');
@@ -13,23 +11,20 @@ export const userHasNoOrganization = createAction('USER_HAS_NO_ORGANIZATION');
 export const organizationHasNoCourseData = createAction('ORGANIZATION_HAS_NO_COURSE_DATA');
 
 export const checkCourseDatabase = () => dispatch => {
-  courseDatabase.migrate()
-    .then(function(db) {
-      // Check the database update time
-      db.executeSql("SELECT * FROM info WHERE key = 'current_courses_updated_at'")
-        .then(function (result) {
-          // if the database has been updated within 6 hours
-          if (result.results.rows.length && ((new Date()) - parseInt(result.results.rows[0].value)) / (60*60*1000) < 6) {
-            // dispatch the updated action to update the DB update time in the store
-            dispatch(courseDatabaseUpdated(parseInt(result.results.rows[0].value)));
+  // Check the database update time
+  courseDatabase.executeSql("SELECT * FROM info WHERE key = 'current_courses_updated_at'")
+    .then(function (result) {
+      // if the database has been updated within 6 hours
+      if (result.results.rows.length && result.results.rows[0] && ((new Date()) - parseInt(result.results.rows[0].value)) / (60*60*1000) < 6) {
+        // dispatch the updated action to update the DB update time in the store
+        dispatch(courseDatabaseUpdated(parseInt(result.results.rows[0].value)));
 
-          } else {
-            // update the DB
-            dispatch(doUpdateCourseDatabase());
-          }
+      } else {
+        // update the DB
+        dispatch(doUpdateCourseDatabase());
+      }
 
-          dispatch(checkCourseDatabaseDone());
-        });
+      dispatch(checkCourseDatabaseDone());
     });
 };
 
@@ -174,7 +169,7 @@ export const doUpdateCourseDatabase = (courseYear = colorgyAPI.getCurrentYear(),
           ) VALUES ${insertSQLValues.join(', ')}`;
 
           return new Promise( (resolve, reject) => {
-            courseDatabase.migrate().then( (db) => db.executeSql(insertSQL) )
+            courseDatabase.executeSql(insertSQL)
               .then( () => {
                 resolve();
               }).catch( (e) => {
@@ -194,12 +189,10 @@ export const doUpdateCourseDatabase = (courseYear = colorgyAPI.getCurrentYear(),
 
     // Clear the database and fire first request
     var firstRequestPromise = new Promise( (resolve, reject) => {
-      courseDatabase.migrate()
-        .then(function (db) {
-          let sql = `DELETE FROM courses WHERE year = ${courseYear} AND term = ${courseTerm}`;
-          console.log(sql);
-          return db.executeSql(sql);
-        }).then(function () {
+      let sql = `DELETE FROM courses WHERE year = ${courseYear} AND term = ${courseTerm}`;
+      console.log(sql);
+      courseDatabase.executeSql(sql)
+        .then(function () {
           requestAndSaveCourses(`/${orgCode.toLowerCase()}/courses?filter[year]=${courseYear}&filter[term]=${courseTerm}&per_page=500`, resolve);
         });
     });

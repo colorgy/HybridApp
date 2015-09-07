@@ -8,9 +8,7 @@
 //  }
 //  var db = new WebSQL('TestDB', 'TestDB', 5*1024*1024, migartions);
 //
-//  db.migrate()
-//    .then(function(db) { return db.executeSql('INSERT INTO users (id, name) VALUES (12, "foo")') } )
-//    .then(function (result) { result.db.executeSql('INSERT INTO todos (user_id, name) VALUES (12, "task")') });
+//  db.migrate();
 //
 //  db.executeSql('INSERT INTO users (id, name) VALUES (18, "bar")')
 //    .then(function (result) { return result.db.executeSql('INSERT INTO todos (user_id, name) VALUES (18, "task one")') })
@@ -25,57 +23,106 @@ class WebSQL {
     this.db = window.openDatabase(name, '', displayName, size || 1024 * 1024);
     this.dbName = name;
     this.migrations = migrations;
+    let migrationKeys = Object.keys(migrations);
+    this.migrationsLastVerison = migrationKeys[migrationKeys.length - 1];
+
+    this.executeSql("CREATE TABLE IF NOT EXISTS _db_info_(key CHAR(255) PRIMARY KEY, value TEXT)", null, false).then( (result) => {
+      this.executeSql("SELECT * FROM _db_info_ WHERE key = 'schema_verison'", null, false).then( (result) => {
+        if (result.results.rows.length && result.results.rows[0]) {
+          this.version = result.results.rows[0].value;
+        }
+      });
+    });
   }
 
   migrate() {
-    var fromVersionIndex = null;
-    var currentVersion = this.db.version;
-    var versions = Object.keys(this.migrations);
-    var latestVersion = versions[versions.length - 1];
 
-    if (currentVersion !== latestVersion) {
+    var migrateDB = (currentVersion) => {
+      var fromVersionIndex = null;
+      var versions = Object.keys(this.migrations);
+      var latestVersion = versions[versions.length - 1];
 
-      if (!currentVersion || currentVersion === '' || currentVersion === 'null') {
-        fromVersionIndex = -1;
-      } else {
-        fromVersionIndex = versions.indexOf(currentVersion);
+      if (currentVersion !== latestVersion) {
 
-        if (fromVersionIndex === -1) {
-          console.error(`WebSQL: migration error: Can't locate current version: ${currentVersion} in migrations stack: versions: [${versions.join(', ')}]`);
-          return;
+        if (!currentVersion || currentVersion === '' || currentVersion === 'null') {
+          fromVersionIndex = -1;
+        } else {
+          fromVersionIndex = versions.indexOf(currentVersion);
+
+          if (fromVersionIndex === -1) {
+            console.error(`WebSQL: migration error: Can't locate current version: ${currentVersion} in migrations stack: versions: [${versions.join(', ')}]`);
+            return;
+          }
         }
-      }
 
-      var executeMigrationVersions = versions.slice(fromVersionIndex + 1);
+        var executeMigrationVersions = versions.slice(fromVersionIndex + 1);
 
-      return executeMigrationVersions.reduce( (previousPromise, version) => {
-        console.log(`WebSQL: database migration required: ${this.dbName}: to ${version}`);
-        return previousPromise.then( () => {
-          return new Promise( (resolve, reject) => {
-            var lastVersion = versions[versions.indexOf(version) - 1];
-            if (!lastVersion) lastVersion = currentVersion;
-            console.log(`WebSQL: migrating database ${this.dbName} from ${lastVersion} to ${version}`);
-            this.db.changeVersion(lastVersion, version, (transaction) => {
-              transaction.executeSql(this.migrations[version], null, () => {
-                resolve(this);
-              }, () => {
-                reject();
+        return executeMigrationVersions.reduce( (previousPromise, version) => {
+          console.log(`WebSQL: database migration required: ${this.dbName}: to ${version}`);
+          return previousPromise.then( () => {
+            return new Promise( (resolve, reject) => {
+              var lastVersion = versions[versions.indexOf(version) - 1];
+              if (!lastVersion) lastVersion = currentVersion;
+              console.log(`WebSQL: migrating database ${this.dbName} from ${lastVersion} to ${version}`);
+              this.db.transaction( (transaction) => {
+                transaction.executeSql(this.migrations[version], null, () => {
+                  transaction.executeSql("INSERT OR REPLACE INTO _db_info_ (key, value) VALUES ('schema_verison' , ?)", [version], () => {
+                    this.version = version;
+                    resolve(this);
+                  }, (t, e) => {
+                    reject(e);
+                  });
+                }, (t, e) => {
+                  reject(e);
+                });
               });
             });
           });
-        });
-      }, Promise.resolve(this));
-    } else {
-      return Promise.resolve(this);
+        }, Promise.resolve(this));
+      } else {
+        return Promise.resolve(this);
+      }
     }
+
+    return this.executeSql("CREATE TABLE IF NOT EXISTS _db_info_(key CHAR(255) PRIMARY KEY, value TEXT)", null, false).then( (result) => {
+
+      return this.executeSql("SELECT * FROM _db_info_ WHERE key = 'schema_verison'", null, false).then( (result) => {
+        var schemaVerison = null;
+        if (result.results.rows.length && result.results.rows[0]) {
+          schemaVerison = result.results.rows[0].value;
+        }
+
+        return migrateDB(schemaVerison);
+      });
+    });
   }
 
-  executeSql(sqlQuery, params = []) {
-    return new Promise( (resolve, reject) => this.db.transaction( (t) => t.executeSql(sqlQuery, params, (transaction, results) => {
-      resolve({ db: this, transaction: transaction, results: results });
-    }, (transaction, error) => {
-      reject({ db: this, transaction: transaction, error: error, query: sqlQuery });
-    }) ) );
+  executeSql(sqlQuery, params = [], ensureMigrated = true) {
+    return new Promise( (resolve, reject) => {
+      if (ensureMigrated) var startedAt = (new Date());
+
+      var execute = () => {
+        if (ensureMigrated) {
+          if (this.version != this.migrationsLastVerison) {
+            console.log(`WebSQL: ${this.dbName}: executeSql: Watitig for migration done...`)
+            if ((new Date()) - startedAt > 5000) {
+              reject({ error: 'Migration Timeout' })
+            } else {
+              setTimeout(execute, 100)
+            }
+            return;
+          }
+        }
+
+        this.db.transaction( (t) => t.executeSql(sqlQuery, params, (transaction, results) => {
+          resolve({ db: this, transaction: transaction, results: results });
+        }, (transaction, error) => {
+          reject({ db: this, transaction: transaction, error: error, query: sqlQuery });
+        }) );
+      }
+
+      execute();
+    });
   }
 
   reset() {
