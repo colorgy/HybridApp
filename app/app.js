@@ -1,4 +1,5 @@
-require("babel/polyfill");
+require('es6-promise').polyfill();
+require('babel/polyfill');
 
 import React from 'react';
 import Router from 'react-router';
