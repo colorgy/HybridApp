@@ -15,9 +15,9 @@ export const checkCourseDatabase = () => dispatch => {
   courseDatabase.executeSql("SELECT * FROM info WHERE key = 'current_courses_updated_at'")
     .then(function (result) {
       // if the database has been updated within 6 hours
-      if (result.results.rows.length && result.results.rows[0] && ((new Date()) - parseInt(result.results.rows[0].value)) / (60*60*1000) < 6) {
+      if (result.results.rows.length && result.results.rows.item(0) && ((new Date()) - parseInt(result.results.rows.item(0).value)) / (60*60*1000) < 6) {
         // dispatch the updated action to update the DB update time in the store
-        dispatch(courseDatabaseUpdated(parseInt(result.results.rows[0].value)));
+        dispatch(courseDatabaseUpdated(parseInt(result.results.rows.item(0).value)));
 
       } else {
         // update the DB
@@ -173,13 +173,16 @@ export const doUpdateCourseDatabase = (courseYear = colorgyAPI.getCurrentYear(),
               .then( () => {
                 resolve();
               }).catch( (e) => {
+                console.error(e);
                 dispatch(courseDatabaseUpdateFaild(e));
               });
           }).catch( (e) => {
+            console.error(e);
             dispatch(courseDatabaseUpdateFaild(e));
           });
         }
       }).catch( (e) => {
+        console.error(e);
         dispatch(courseDatabaseUpdateFaild(e));
       });
 
@@ -204,6 +207,7 @@ export const doUpdateCourseDatabase = (courseYear = colorgyAPI.getCurrentYear(),
         dispatch(courseDatabaseUpdated((new Date()).getTime()));
       });
     }).catch( (e) => {
+      console.error(e);
       dispatch(courseDatabaseUpdateFaild(e));
     });
 

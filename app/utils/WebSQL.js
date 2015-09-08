@@ -92,8 +92,8 @@ class WebSQL {
 
       return this.executeSql("SELECT * FROM _db_info_ WHERE key = 'schema_verison'", null, false).then( (result) => {
         var schemaVerison = null;
-        if (result.results.rows.length && result.results.rows[0]) {
-          schemaVerison = result.results.rows[0].value;
+        if (result.results.rows.length && result.results.rows.item(0)) {
+          schemaVerison = result.results.rows.item(0).value;
         }
 
         return migrateDB(schemaVerison);
