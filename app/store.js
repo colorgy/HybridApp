@@ -14,6 +14,7 @@ const loggerMiddleware = createLogger({
 
 const createPersistentStore = compose(
   persistState(['appUser'], { key: 'app_user_store' }),
+  persistState(['table'], { key: 'table_store' }),
   createStore
 )
 

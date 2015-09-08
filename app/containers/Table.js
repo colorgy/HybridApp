@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { RaisedButton, LinearProgress } from 'material-ui';
 import tableActions, { checkCourseDatabase } from '../actions/tableActions';
-import { doUpdateCourseDatabase } from '../actions/tableActions';
+import { initialize, doUpdateCourseDatabase } from '../actions/tableActions';
 import PageRouter, { Route } from '../components/PageRouter';
 import Page from '../components/Page';
 import CenteredPage from '../components/CenteredPage';
@@ -14,6 +14,7 @@ import Link from '../components/Link';
 var Table = React.createClass({
 
   componentWillMount() {
+    this.props.dispatch(initialize());
     this.props.dispatch(checkCourseDatabase());
   },
 
@@ -42,6 +43,7 @@ var Table = React.createClass({
       return (
         <CenteredPage adjustForAppTab>
           <div>您沒有選擇學校。</div>
+          <RaisedButton label="重試" onTouchTap={ () => this.props.dispatch(doUpdateCourseDatabase()) } />
         </CenteredPage>
       );
 
@@ -50,6 +52,7 @@ var Table = React.createClass({
       return (
         <CenteredPage adjustForAppTab>
           <div>您的學校尚無課程資料。</div>
+          <RaisedButton label="重試" onTouchTap={ () => this.props.dispatch(doUpdateCourseDatabase()) } />
         </CenteredPage>
       );
 

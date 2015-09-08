@@ -3,6 +3,7 @@ import store from '../store';
 import colorgyAPI from '../utils/colorgyAPI';
 import courseDatabase from '../databases/courseDatabase';
 
+export const initialize = createAction('TABLE_INITIALIZE');
 export const checkCourseDatabaseDone = createAction('CHECK_COURSE_DATABASE_DONE');
 export const updateCourseDatabase = createAction('UPDATE_COURSE_DATABASE');
 export const courseDatabaseUpdated = createAction('COURSE_DATABASE_UPDATED');
@@ -199,6 +200,58 @@ export const doUpdateCourseDatabase = (courseYear = colorgyAPI.getCurrentYear(),
           requestAndSaveCourses(`/${orgCode.toLowerCase()}/courses?filter[year]=${courseYear}&filter[term]=${courseTerm}&per_page=500`, resolve);
         });
     });
+
+    // Get period data
+    var periodDataRequestPromise = new Promise( (resolve, reject) => {
+      let sql = `DELETE FROM period_data`;
+      console.log(sql);
+      courseDatabase.executeSql(sql)
+        .then( () => {
+          let url = `/${orgCode.toLowerCase()}/period_data?per_page=500`;
+          colorgyAPI.request({ url: url }).then( (response) => {
+            console.log('get')
+
+            // If the organization has no course data
+            if (response.status == 404) {
+              dispatch(organizationHasNoCourseData());
+
+            } else {
+              // Parse the data and construct SQL insert query
+              var insertSQLValues = response.body.map(function (period) {
+                return `(
+                  ${sqlValue(period.order)},
+                  ${sqlValue(period.code)},
+                  ${sqlValue(period.time)}
+                )`;
+              });
+
+              var insertSQL = `INSERT INTO period_data (
+                "order",
+                code,
+                time
+              ) VALUES ${insertSQLValues.join(', ')}`;
+
+              courseDatabase.executeSql(insertSQL)
+                .then( () => {
+                  console.log(insertSQL)
+                  resolve();
+                }).catch( (e) => {
+                  console.error(e);
+                  dispatch(courseDatabaseUpdateFaild(e));
+                  reject(e);
+                });
+            }
+          });
+        }, (e) => {
+          console.error(e);
+          reject(e);
+        }).catch( (e) => {
+          console.error(e);
+          reject(e);
+        });
+    });
+
+    requestPromises.push(periodDataRequestPromise);
 
     // Wait for all request to be done, then dispatch the done action
     firstRequestPromise.then( () => {

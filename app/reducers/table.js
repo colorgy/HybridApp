@@ -1,8 +1,21 @@
 import { handleActions } from 'redux-actions';
 
-var defaultState = {};
+var initialState = {
+  checkCourseDatabaseDone: false
+};
+
+var defaultState = {
+  ...initialState
+};
 
 export default handleActions({
+
+  TABLE_INITIALIZE: (state, action) => {
+    return {
+      ...state,
+      ...initialState
+    };
+  },
 
   CHECK_COURSE_DATABASE_DONE: (state, action) => {
     return {
