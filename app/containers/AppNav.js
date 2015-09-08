@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 import appUserSelector from '../selectors/appUserSelector';
 import { logout } from '../actions/appUserActions';
 import AppNavHeader from '../components/AppNavHeader';
-import { AppCanvas, AppBar, LeftNav, MenuItem, Tabs, Tab } from 'material-ui';
+import { AppCanvas, AppBar, MenuItem, Tabs, Tab } from 'material-ui';
+import LeftNav from '../components/LeftNav';
 
 var AppNav = React.createClass({
   contextTypes: {

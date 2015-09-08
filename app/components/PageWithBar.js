@@ -31,7 +31,7 @@ export default React.createClass({
       height: '100%',
       paddingTop: getBarHeight(),
       paddingBottom: getAppTabHeight(),
-      overflow: 'scroll',
+      overflow: 'auto',
       WebkitOverflowScrolling: 'touch',
       ...this.props.style
     }

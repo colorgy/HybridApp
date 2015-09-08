@@ -4,7 +4,7 @@ import appTabSelector from '../selectors/appTabSelector';
 import appUserSelector from '../selectors/appUserSelector';
 import { doLogout } from '../actions/appUserActions';
 import { appPageBack } from '../actions/appPageActions';
-import { AppCanvas, AppBar, LeftNav, MenuItem, Tabs, Tab } from 'material-ui';
+import { AppCanvas, AppBar, MenuItem, Tabs, Tab } from 'material-ui';
 import Login from './Login';
 import AppNav from './AppNav';
 import AppTab from './AppTab';

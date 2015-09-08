@@ -9,7 +9,7 @@ export default React.createClass({
       boxSizing: 'border-box',
       height: '100%',
       paddingBottom: Spacing.desktopKeylineIncrement + 'px',
-      overflow: 'scroll',
+      overflow: 'auto',
       WebkitOverflowScrolling: 'touch',
       ...this.props.style
     }
