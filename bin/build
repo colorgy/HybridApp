@@ -9,19 +9,28 @@ case "$TARGET" in
     echo 'Start building web app...'
     reapp-build web
     ;;
+
   *)
     echo 'Start building app...'
+
     reapp-build cordova
+
     cd cordova
     if [ ! -d "/tmp/phonegap-facebook-plugin" ]; then
       git clone https://github.com/Wizcorp/phonegap-facebook-plugin.git /tmp/phonegap-facebook-plugin --depth=5
     fi
     cordova -d plugin add /tmp/phonegap-facebook-plugin --variable APP_ID="752440461479659" --variable APP_NAME="Colorgy"
-    cordova platform add ios
-    cordova platform add android
-    cordova prepare
-    cordova build ios
-    cordova build android
+
+    if [ "$TARGET" == 'ios' ] || [ "$TARGET" == '' ]; then
+      cordova platform add ios
+      cordova build ios
+    fi
+
+    if [ "$TARGET" == 'android' ] || [ "$TARGET" == '' ]; then
+      cordova platform add android
+      cordova build android
+    fi
+
     cd ..
     ;;
 esac

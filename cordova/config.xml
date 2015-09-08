@@ -29,4 +29,5 @@
     </platform>
     <preference name="DisallowOverscroll" value="true" />
     <plugin name="cordova-plugin-statusbar" spec="~1.0.1" />
+    <plugin name="io.litehelpers.cordova.sqlite" spec="~0.7.7" />
 </widget>
