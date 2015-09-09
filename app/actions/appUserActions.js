@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import colorgyAPI from '../utils/colorgyAPI';
 import courseDatabase from '../databases/courseDatabase';
+import tableDatabase from '../databases/tableDatabase';
 
 import { createAction } from 'redux-actions';
 
@@ -81,6 +82,7 @@ export const downloadAppUserImage = payload => dispatch => {
 export const doLogout = payload => dispatch => {
   dispatch(logout());
   courseDatabase.reset();
+  tableDatabase.reset();
 }
 
 export const logout = createAction('LOGOUT');
