@@ -165,14 +165,30 @@ class WebSQL {
 
             dropTables.then( () => {
               this.db.changeVersion(this.db.version, '', () => resolve());
+              this.version = null;
               console.log(`WebSQL: reset: done.`);
             });
           } else {
             this.db.changeVersion(this.db.version, '', () => resolve());
+            this.version = null;
             console.log(`WebSQL: reset: done.`);
           }
         });
     });
+  }
+
+  sqlValue(value) {
+    if (value === true) {
+      return 1;
+    } else if (value === false) {
+      return 0;
+    } else if (typeof value === "string") {
+      return "'" + value.replace("'", "''") + "'";
+    } else if (typeof value === "number") {
+      return value;
+    } else {
+      return 'NULL';
+    }
   }
 }
 
