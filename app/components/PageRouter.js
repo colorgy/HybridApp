@@ -1,7 +1,7 @@
 import React from 'react';
 import URLPattern from 'url-pattern';
 import qs from 'qs';
-import { appPageNavigate, appPageBack } from '../actions/appPageActions';
+import { pageRouterNavigate, pageRouterBack } from '../actions/pageRouterActions';
 import store from '../store';
 
 function matchRoutes(routes, path) {
@@ -62,7 +62,8 @@ var PageRouter = React.createClass({
     var currentPage = null;
     var currentPageProps = {};
     var CurrentPageHandler = null;
-    var currentPath = this.props.currentPath || '/';
+    var history = this.props.history;
+    var currentPath = (history && history[history.length - 1]) || '/';
     if (currentPath) {
       let match = matchRoutes(routes, currentPath);
       currentPage = match.page;
@@ -108,12 +109,12 @@ var Route = React.createClass({
   }
 });
 
-var pageNavigateTo = function (path) {
-  store.dispatch(appPageNavigate(path));
+var pageNavigateTo = function (key, path) {
+  store.dispatch(pageRouterNavigate({ key: key, path: path }));
 }
 
-var pageNavigateBack = function (path) {
-  store.dispatch(appPageBack());
+var pageNavigateBack = function (key, path) {
+  store.dispatch(pageRouterBack({ key: key }));
 }
 
 export default PageRouter;

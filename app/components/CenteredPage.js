@@ -1,7 +1,7 @@
 import React from 'react';
 import { Styles } from 'material-ui';
 let { Spacing } = Styles;
-import { getAppTabHeight } from '../containers/AppTab';
+import { getAppTabHeight } from './AppTab';
 
 export default React.createClass({
 

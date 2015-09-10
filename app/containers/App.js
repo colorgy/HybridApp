@@ -1,18 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import appTabSelector from '../selectors/appTabSelector';
-import appUserSelector from '../selectors/appUserSelector';
 import { doLogout } from '../actions/appUserActions';
-import { appPageBack } from '../actions/appPageActions';
-import { AppCanvas, AppBar, MenuItem, Tabs, Tab } from 'material-ui';
+import { pageRouterBack } from '../actions/pageRouterActions';
+import { AppCanvas } from 'material-ui';
 import Login from './Login';
 import AppNav from './AppNav';
-import AppTab from './AppTab';
 import ThemeManager from '../theme/ThemeManager';
 import Table from './Table';
 import Chat from './Chat';
 import About from './About';
 import License from './License';
+import AppTab, { Tab } from '../components/AppTab';
 import LogoutDialog from '../components/LogoutDialog';
 
 var App = React.createClass({
@@ -41,28 +39,25 @@ var App = React.createClass({
   componentWillMount() {
     if (window) window.toggleAppNav = this.toggleAppNav;
 
-    document.addEventListener("deviceready", onDeviceReady, false);
-
-    function onDeviceReady() {
-      document.addEventListener("backbutton", onBackKeyDown, false);
-    }
-
     var self = this;
     function onBackKeyDown(e) {
-      var currentHistroy = self.props.appPageHistory[self.props.appTabIndex];
-      if (currentHistroy && currentHistroy.length > 0) {
+      if (true) {
         e.preventDefault();
-        self.props.dispatch(appPageBack(true));
+        self.props.dispatch(pageRouterBack({ key: self.state.currentTab }));
       } else {
         return true;
       }
     }
+    document.addEventListener("backbutton", onBackKeyDown, false);
+  },
+
+  handleTabChange(tabName) {
+    this.setState({ currentTab: tabName });
   },
 
   render() {
 
     if (this.props.isLogin) {
-
       return (
         <AppCanvas>
 
@@ -70,20 +65,12 @@ var App = React.createClass({
             ref="appNav"
             handleLogout={this.handleLogout} />
 
-          <div style={this.getTabStyle(0)}>
-            <Table/>
-          </div>
-          <div style={this.getTabStyle(1)}>
-            <Chat/>
-          </div>
-          <div style={this.getTabStyle(2)}>
-            <About/>
-          </div>
-          <div style={this.getTabStyle(3)}>
-            <License/>
-          </div>
-
-          <AppTab/>
+          <AppTab onTabChange={this.handleTabChange}>
+            <Tab name="table" displayedName="Table" handler={Table} />
+            <Tab name="chat" displayedName="Chat" handler={Chat} />
+            <Tab name="about" displayedName="About" handler={About} />
+            <Tab name="license" displayedName="License" handler={License} />
+          </AppTab>
 
           <LogoutDialog
             ref="logoutDialog"
@@ -111,9 +98,5 @@ var App = React.createClass({
 });
 
 export default connect(state => ({
-  isLogin: state.appUser.isLogin,
-  appTabIndex: state.appTab.appTabIndex,
-  appPageHistory: state.appPage.history,
-  appPageCurrentPath: state.appPage.currentPath,
-  appPagePreviousPath: state.appPage.previousPath
+  isLogin: state.appUser.isLogin
 }))(App);

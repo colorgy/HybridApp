@@ -1,15 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { RaisedButton, LinearProgress } from 'material-ui';
-import tableActions, { checkCourseDatabase } from '../actions/tableActions';
-import { initialize, doUpdateCourseDatabase, doFindCourse } from '../actions/tableActions';
+import tableActions, { checkCourseDatabase, initialize, doUpdateCourseDatabase } from '../actions/tableActions';
 import PageRouter, { Route } from '../components/PageRouter';
-import Page from '../components/Page';
 import CenteredPage from '../components/CenteredPage';
 import TablePage from './Table/TablePage';
 import CoursePage from './Table/CoursePage';
+import MyCoursesPage from './Table/MyCoursesPage';
 import UserPage from './Table/UserPage';
-import Link from '../components/Link';
 
 var Table = React.createClass({
 
@@ -71,8 +69,9 @@ var Table = React.createClass({
     // Table
     } else {
       return (
-        <PageRouter currentPath={this.props.pageCurrentPath} previousPath={this.props.pagePreviousPath}>
+        <PageRouter history={this.props.routerHistroy}>
           <Route path="/" handler={TablePage} />
+          <Route path="/me/courses" handler={MyCoursesPage} />
           <Route path="/courses/:code" handler={CoursePage} />
           <Route path="/users/:username" handler={UserPage} />
         </PageRouter>
@@ -82,6 +81,7 @@ var Table = React.createClass({
 });
 
 export default connect(state => ({
+  routerHistroy: state.pageRouter.tableHistory,
   checkCourseDatabaseDone: state.table.checkCourseDatabaseDone,
   courseDatabaseUpdating: state.table.courseDatabaseUpdating,
   courseDatabaseUpdateSuccess: state.table.courseDatabaseUpdateSuccess,

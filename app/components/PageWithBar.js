@@ -1,8 +1,8 @@
 import React from 'react';
 import { Mixins, Styles, SvgIcon, AppBar, IconButton } from 'material-ui';
-import { appPageBack } from '../actions/appPageActions';
+import { pageRouterBack } from '../actions/pageRouterActions';
 let { Spacing, Colors } = Styles;
-import { getAppTabHeight } from '../containers/AppTab';
+import { getAppTabHeight } from './AppTab';
 
 var getBarHeight = function () {
   if (typeof cordova !== 'undefined' && cordova.platformId == 'ios') {
@@ -102,7 +102,7 @@ export default React.createClass({
 
   handleLeftIconButtonTouchTap() {
     if (this.props.hasBack) {
-      store.dispatch(appPageBack());
+      store.dispatch(pageRouterBack({ key: this.props.pageRouterkey }));
     } else {
       toggleAppNav();
     }

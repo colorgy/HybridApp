@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { appPageNavigate, appPageBack } from '../actions/appPageActions';
+import { pageRouterNavigate, pageRouterBack } from '../actions/pageRouterActions';
 
 var Link = React.createClass({
 
@@ -10,9 +10,9 @@ var Link = React.createClass({
 
   handleClick() {
     if (this.props.href == 'back') {
-      this.props.dispatch(appPageBack(this.props.appTabIndex));
+      this.props.dispatch(pageRouterBack(this.props.appTabIndex));
     } else {
-      this.props.dispatch(appPageNavigate(this.props.href));
+      this.props.dispatch(pageRouterNavigate(this.props.href));
     }
   },
 

@@ -5,9 +5,11 @@ import ChatIndex from './Chat/ChatIndex';
 import ChatConversation from './Chat/ChatConversation';
 
 var Chat = React.createClass({
+
   render() {
+
     return (
-      <PageRouter currentPath={this.props.pageCurrentPath} previousPath={this.props.pagePreviousPath}>
+      <PageRouter history={this.props.routerHistroy}>
         <Route path="/" handler={ChatIndex} />
         <Route path="/conversations/:cid" handler={ChatConversation} />
       </PageRouter>
@@ -16,7 +18,5 @@ var Chat = React.createClass({
 });
 
 export default connect(state => ({
-  pageHistory: state.appPage.history[state.appTab.appTabIndex],
-  pageCurrentPath: state.appPage.currentPath,
-  pagePreviousPath: state.appPage.previousPath
+  routerHistroy: state.pageRouter.chatHistory
 }))(Chat);

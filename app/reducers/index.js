@@ -2,12 +2,12 @@ import { combineReducers } from 'redux';
 
 import appUser from './appUser';
 import appTab from './appTab';
-import appPage from './appPage';
+import pageRouter from './pageRouter';
 import table from './table';
 
 export default combineReducers({
   appUser,
   appTab,
-  appPage,
+  pageRouter,
   table
 });

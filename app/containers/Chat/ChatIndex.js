@@ -8,8 +8,8 @@ export default React.createClass({
     return (
       <PageWithBar style={this.props.style}>
         <h1>Hello Chat</h1>
-        <RaisedButton label="Go to a conversation" onTouchTap={() => pageNavigateTo('/conversations/3829')} />
-        <RaisedButton label="Go to another conversation" onTouchTap={() => pageNavigateTo('/conversations/3893')} />
+        <RaisedButton label="Go to a conversation" onTouchTap={() => pageNavigateTo('chat', '/conversations/3829')} />
+        <RaisedButton label="Go to another conversation" onTouchTap={() => pageNavigateTo('chat', '/conversations/3893')} />
       </PageWithBar>
     );
   }
