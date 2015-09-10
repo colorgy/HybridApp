@@ -1,5 +1,6 @@
 import WebSQL from '../utils/WebSQL';
 import colorgyAPI from '../utils/colorgyAPI';
+import courseDatabase from './courseDatabase';
 
 var migartions = {
   '1.0': 'CREATE TABLE user_courses(uuid CHARACTER(255) PRIMARY KEY, user_id INTEGER, course_code CHARACTER(255), course_organization_code CHARACTER(255), year INTEGER, term INTEGER, deleted_at DATETIME, synced_at DATETIME);'
@@ -165,7 +166,6 @@ tableDatabase.syncUserCourses = (userID, orgCode, year = colorgyAPI.getCurrentYe
 }
 
 tableDatabase.findUserCourses = (userID, orgCode, year = colorgyAPI.getCurrentYear(), term = colorgyAPI.getCurrentTerm()) => {
-  if (typeof courseCodes === 'string') courseCodes = [courseCodes];
 
   return new Promise( (resolve, reject) => {
     tableDatabase.executeSql("SELECT * FROM user_courses WHERE user_id = ? AND course_organization_code = ? AND year = ? AND term = ?", [userID, orgCode, year, term]).then( (r) => {
@@ -181,6 +181,22 @@ tableDatabase.findUserCourses = (userID, orgCode, year = colorgyAPI.getCurrentYe
       console.error(e);
       reject(e);
     })
+  });
+}
+
+tableDatabase.findCourses = (userID, orgCode, year = colorgyAPI.getCurrentYear(), term = colorgyAPI.getCurrentTerm()) => {
+
+  return new Promise( (resolve, reject) => {
+    tableDatabase.findUserCourses(userID, orgCode, year, term).then( (userCourses) => {
+      courseDatabase.findCourses(userCourses.map( (c) => c.course_code )).then( (courses) => {
+        resolve(courses);
+      }).catch( (e) => {
+        reject(e);
+      });
+
+    }).catch( (e) => {
+      reject(e);
+    });
   });
 }
 

@@ -137,7 +137,7 @@ class WebSQL {
 
           var dropTablesQueries = [];
           for (let i=0; i< rows.length; i++) {
-            let row = rows[i];
+            let row = rows.item(i);
             let keys = Object.keys(row);
             dropTablesQueries.push(row[keys[0]]);
           }
@@ -148,31 +148,34 @@ class WebSQL {
 
           if (dropTablesQueries && dropTablesQueries.length) {
 
-            let dropTables = dropTablesQueries.reduce( (previousPromise, dropTablesQuery) => {
-              return previousPromise.then( () => {
-                return new Promise( (resolve, reject) => {
-                  console.log(`WebSQL: reset: executing ${dropTablesQuery}...`);
-                  this.db.transaction( (transaction) => {
-                    transaction.executeSql(dropTablesQuery, null, () => {
-                      resolve();
-                    }, () => {
-                      resolve();
-                    });
+            let dropTablePromises = [];
+
+            dropTablesQueries.forEach( (dropTablesQuery) => {
+              let p = new Promise( (resolve, reject) => {
+                console.log(`WebSQL: reset: executing ${dropTablesQuery}...`);
+                this.db.transaction( (transaction) => {
+                  transaction.executeSql(dropTablesQuery, null, () => {
+                    resolve();
+                  }, (e) => {
+                    reject(e);
                   });
                 });
               });
-            }, Promise.resolve(this));
+              dropTablePromises.push(p);
+            });
 
-            dropTables.then( () => {
-              this.db.changeVersion(this.db.version, '', () => resolve());
+            Promise.all(dropTablePromises).then( () => {
               this.version = null;
               console.log(`WebSQL: reset: done.`);
+            }).catch( (e) => {
+              reject(e);
             });
           } else {
-            this.db.changeVersion(this.db.version, '', () => resolve());
             this.version = null;
             console.log(`WebSQL: reset: done.`);
           }
+        }).catch( (e) => {
+          reject(e);
         });
     });
   }

@@ -2,6 +2,7 @@ import { createAction } from 'redux-actions';
 import store from '../store';
 import colorgyAPI from '../utils/colorgyAPI';
 import courseDatabase from '../databases/courseDatabase';
+import tableDatabase from '../databases/tableDatabase';
 
 export const initialize = createAction('TABLE_INITIALIZE');
 export const checkCourseDatabaseDone = createAction('CHECK_COURSE_DATABASE_DONE');
@@ -41,6 +42,7 @@ export const doUpdateCourseDatabase = (courseYear = colorgyAPI.getCurrentYear(),
   if (orgCode) {
     courseDatabase.updateData(orgCode, courseYear, courseTerm).then( () => {
       dispatch(courseDatabaseUpdated((new Date()).getTime()));
+      dispatch(doLoadTableCourses());
     }).catch( (e) => {
       if (e === 404) {
         dispatch(organizationHasNoCourseData());
@@ -56,35 +58,40 @@ export const doUpdateCourseDatabase = (courseYear = colorgyAPI.getCurrentYear(),
 };
 
 export const syncUserCourses = createAction('SYNC_USER_COURSES');
-export const receivedUserCourses = createAction('RECEIVED_USER_COURSES');
-export const userCoursesDeleted = createAction('USER_COURSES_DELETED');
 export const userCoursesSyncDone = createAction('USER_COURSES_SYNC_DONE');
 export const userCoursesSyncFaild = createAction('USER_COURSES_SYNC_FAILD');
 
 export const doSyncUserCourses = (courseYear = colorgyAPI.getCurrentYear(), courseTerm = colorgyAPI.getCurrentTerm()) => dispatch => {
   dispatch(syncUserCourses());
 
-  courseDatabase.migrate();
+  tableDatabase.migrate();
 
-  var orgCode = store.getState().appUser.possible_organization_code;
-
-  var url = `/me/user_courses.json?per_page=1000&filter[course_organization_code]=${orgCode}&filter[year]=${courseYear}&filter[term]=${courseTerm}`;
-
-  colorgyAPI.request({ url: url }).then( (response) => {
-    var userCourses = response.body;
-    dispatch(receivedUserCourses(userCourses);
-    dispatch(userCoursesSyncDone(new Date()));
-  }).catch( (e) => {
-    console.error(e);
-    dispatch(userCoursesSyncDone(e));
+  tableDatabase.syncUserCourses(store.getState().appUser.id, store.getState().appUser.possible_organization_code, courseYear, courseTerm).then(function () {
+    dispatch(userCoursesSyncDone());
+    dispatch(doLoadTableCourses());
+  }).catch(function (e) {
+    dispatch(userCoursesSyncFaild());
   });
 };
 
-export const searchCurrentCourses = (query) => dispatch => {
-  courseDatabase.executeSql('SELECT * FROM info WHERE key = "updated_at"').then( (r) => {
-    if (r.results.rows.length) {
-      dispatch(updateCourseDatabase());
-      var orgCode = store.getState().appUser.possible_organization_code;
-    }
-  })
+export const loadTableCourse = createAction('LOAD_TABLE_COURSES');
+export const tableCourseLoaded = createAction('TABLE_COURSES_LOADED');
+export const loadTableCourseFaild = createAction('LOAD_TABLE_COURSES_FAILD');
+
+export const doLoadTableCourses = () => dispatch => {
+  dispatch(loadTableCourse());
+
+  courseDatabase.migrate();
+  tableDatabase.migrate();
+
+  courseDatabase.getPeriodData().then( (periodData) => {
+    tableDatabase.findCourses(store.getState().appUser.id, store.getState().appUser.possible_organization_code).then(function (courses) {
+      dispatch(tableCourseLoaded({ courses: courses, periodData: periodData }));
+    }).catch( (e) => {
+      dispatch(loadTableCourseFaild());
+    });
+
+  }).catch( (e) => {
+    dispatch(loadTableCourseFaild());
+  });
 };

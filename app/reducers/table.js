@@ -66,6 +66,29 @@ export default handleActions({
     };
   },
 
+  LOAD_TABLE_COURSES: (state, action) => {
+    return {
+      ...state,
+      tableCourseLoading: true
+    };
+  },
+
+  TABLE_COURSES_LOADED: (state, action) => {
+    return {
+      ...state,
+      tableCourses: action.payload.courses,
+      tablePeriodData: action.payload.periodData,
+      tableCourseLoading: false
+    };
+  },
+
+  LOAD_TABLE_COURSES_FAILD: (state, action) => {
+    return {
+      ...state,
+      tableCourseLoading: false
+    };
+  },
+
   LOGOUT: (state, action) => {
     return defaultState;
   }

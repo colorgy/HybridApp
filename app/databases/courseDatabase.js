@@ -238,6 +238,25 @@ courseDatabase.updateData = (orgCode, courseYear = colorgyAPI.getCurrentYear(), 
   });
 };
 
+courseDatabase.getPeriodData = () => {
+
+  return new Promise( (resolve, reject) => {
+    courseDatabase.executeSql('SELECT * FROM period_data').then( (r) => {
+      var periodData = [];
+      if (r.results.rows.length) {
+        for (let i=0; i<r.results.rows.length; i++) {
+          let row = r.results.rows.item(i);
+          periodData.push(row);
+        }
+      }
+      resolve(periodData);
+    }).catch( (e) => {
+      console.error(e);
+      reject(e);
+    })
+  });
+}
+
 courseDatabase.findCourses = (courseCodes) => {
   if (typeof courseCodes === 'string') courseCodes = [courseCodes];
 
