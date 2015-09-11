@@ -238,17 +238,32 @@ courseDatabase.updateData = (orgCode, courseYear = colorgyAPI.getCurrentYear(), 
   });
 };
 
-courseDatabase.getPeriodData = () => {
+courseDatabase.getPeriodData = (returnObject = false) => {
 
   return new Promise( (resolve, reject) => {
     courseDatabase.executeSql('SELECT * FROM period_data').then( (r) => {
-      var periodData = [];
-      if (r.results.rows.length) {
-        for (let i=0; i<r.results.rows.length; i++) {
-          let row = r.results.rows.item(i);
-          periodData.push(row);
+
+      if (returnObject) {
+        var periodData = {};
+
+        if (r.results.rows.length) {
+          for (let i=0; i<r.results.rows.length; i++) {
+            let row = r.results.rows.item(i);
+            periodData[row.order] = row;
+          }
+        }
+
+      } else {
+        var periodData = [];
+
+        if (r.results.rows.length) {
+          for (let i=0; i<r.results.rows.length; i++) {
+            let row = r.results.rows.item(i);
+            periodData.push(row);
+          }
         }
       }
+
       resolve(periodData);
     }).catch( (e) => {
       console.error(e);
@@ -261,19 +276,59 @@ courseDatabase.findCourses = (courseCodes) => {
   if (typeof courseCodes === 'string') courseCodes = [courseCodes];
 
   return new Promise( (resolve, reject) => {
-    courseDatabase.executeSql(`SELECT * FROM courses WHERE code IN ('${courseCodes.join("', '")}')`).then( (r) => {
-      var courses = {};
-      if (r.results.rows.length) {
-        for (let i=0; i<r.results.rows.length; i++) {
-          let row = r.results.rows.item(i);
-          courses[row.code] = row;
+    courseDatabase.getPeriodData(true).then( (periodData) => {
+      courseDatabase.executeSql(`SELECT * FROM courses WHERE code IN ('${courseCodes.join("', '")}')`).then( (r) => {
+        var courses = {};
+        if (r.results.rows.length) {
+          for (let i=0; i<r.results.rows.length; i++) {
+            let row = r.results.rows.item(i);
+            row.fullSemester = row.full_semester;
+            row.studentsEnrolled = row.students_enrolled;
+            let times = [];
+            for (let i=1; i<10; i++) {
+              if (row[`day_${i}`] && row[`period_${i}`]) {
+                let day = '';
+                let periodCode = '';
+                switch (row[`day_${i}`]) {
+                  case 1:
+                    day = 'Mon';
+                    break;
+                  case 2:
+                    day = 'Tue';
+                    break;
+                  case 3:
+                    day = 'Wed';
+                    break;
+                  case 4:
+                    day = 'Thu';
+                    break;
+                  case 5:
+                    day = 'Fri';
+                    break;
+                  case 6:
+                    day = 'Sat';
+                    break;
+                  case 7:
+                    day = 'Mon';
+                    break;
+                }
+                if (periodData[row[`period_${i}`]]) periodCode = periodData[row[`period_${i}`]].code
+                times.push(day + periodCode);
+              }
+            }
+            row.times = times.join(' ');
+            courses[row.code] = row;
+          }
         }
-      }
-      resolve(courses);
+        resolve(courses);
+      }).catch( (e) => {
+        console.error(e);
+        reject(e);
+      });
     }).catch( (e) => {
       console.error(e);
       reject(e);
-    })
+    });
   });
 }
 

@@ -68,8 +68,10 @@ var PageRouter = React.createClass({
       let match = matchRoutes(routes, currentPath);
       currentPage = match.page;
       currentPageProps = match.pageProps;
-      window.currentPage = currentPage;
       CurrentPageHandler = currentPage.props.handler;
+      if (typeof CurrentPageHandler.componentWillBeVisibleOnPageRouter === 'function') {
+        CurrentPageHandler.componentWillBeVisibleOnPageRouter();
+      }
     }
 
     var hasPreviousPath = false;

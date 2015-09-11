@@ -1,16 +1,49 @@
 import React from 'react';
-import { RaisedButton } from 'material-ui';
+import { connect } from 'react-redux';
+import { doSyncUserCourses, doLoadTableCourses, doUpdateCourseDatabase } from '../../actions/tableActions';
 import { pageNavigateTo, pageNavigateBack } from '../../components/PageRouter';
+import { Card, CardHeader, Avatar, RaisedButton, IconButton, SvgIcon } from 'material-ui';
+import PageWithBar from '../../components/PageWithBar';
+import CourseCard from '../../components/CourseCard';
 
-export default React.createClass({
+var MyCoursesPage = React.createClass({
+
+  componentWillMount() {
+    this.props.dispatch(doSyncUserCourses());
+    this.props.dispatch(doLoadTableCourses());
+  },
+
+  componentWillBeVisibleOnPageRouter() {
+    this.props.dispatch(doSyncUserCourses());
+    this.props.dispatch(doLoadTableCourses());
+  },
+
+  getMyCourseCards() {
+    if (!this.props.courses) return [];
+
+    let courses = this.props.courses;
+    return Object.keys(courses).map( (k) => courses[k] ).map( (course) => (<CourseCard selected={true} {...course} />));
+  },
+
   render() {
+
+    var pageAction = (
+      <IconButton onTouchTap={this.handleEdit}>
+        <SvgIcon style={{ fill: '#fff' }}>
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          <path d="M0 0h24v24H0z" fill="none"/>
+        </SvgIcon>
+      </IconButton>
+    );
+
     return (
-      <div>
-        This is the {this.props.code} course!
-        <RaisedButton label="Go to another course" onTouchTap={() => pageNavigateTo('/courses/ntust-2892-8225')} />
-        <RaisedButton label="Go to a user" onTouchTap={() => pageNavigateTo('/users/neson')} />
-        <RaisedButton label="Go Back" onTouchTap={() => pageNavigateBack()} />
-      </div>
+      <PageWithBar hasBack pageRouterkey="table" style={this.props.style} title="我的課程" actions={pageAction}>
+        {this.getMyCourseCards()}
+      </PageWithBar>
     );
   }
 });
+
+export default connect(state => ({
+  courses: state.table.tableCourses
+}))(MyCoursesPage);

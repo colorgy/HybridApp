@@ -14,6 +14,11 @@ var TablePage = React.createClass({
     this.props.dispatch(doLoadTableCourses());
   },
 
+  componentWillBeVisibleOnPageRouter() {
+    this.props.dispatch(doSyncUserCourses());
+    this.props.dispatch(doLoadTableCourses());
+  },
+
   render() {
 
     // Convert courses into events
