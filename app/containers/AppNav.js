@@ -23,6 +23,10 @@ var AppNav = React.createClass({
     this.refs.nav.toggle();
   },
 
+  close() {
+    this.refs.nav.close();
+  },
+
   render() {
     var navHeader = <AppNavHeader
       name={this.props.name}

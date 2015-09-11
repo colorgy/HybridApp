@@ -38,6 +38,7 @@ var App = React.createClass({
 
   componentWillMount() {
     if (window) window.toggleAppNav = this.toggleAppNav;
+    if (window) window.toggleAppNav = this.toggleAppNav;
 
     var self = this;
     function onBackKeyDown(e) {
@@ -90,10 +91,15 @@ var App = React.createClass({
 
   handleLogout() {
     this.refs.logoutDialog.show();
+    this.closeAppNav();
   },
 
   toggleAppNav() {
     this.refs.appNav.refs.wrappedInstance.toggle();
+  },
+
+  closeAppNav() {
+    this.refs.appNav.refs.wrappedInstance.close();
   }
 });
 
