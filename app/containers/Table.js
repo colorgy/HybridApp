@@ -7,6 +7,7 @@ import CenteredPage from '../components/CenteredPage';
 import TablePage from './Table/TablePage';
 import CoursePage from './Table/CoursePage';
 import MyCoursesPage from './Table/MyCoursesPage';
+import CoursesPage from './Table/CoursesPage';
 import UserPage from './Table/UserPage';
 
 var Table = React.createClass({
@@ -71,6 +72,7 @@ var Table = React.createClass({
       return (
         <PageRouter history={this.props.routerHistroy}>
           <Route path="/" handler={TablePage} />
+          <Route path="/courses" handler={CoursesPage} />
           <Route path="/me/courses" handler={MyCoursesPage} />
           <Route path="/courses/:code" handler={CoursePage} />
           <Route path="/users/:username" handler={UserPage} />

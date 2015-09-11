@@ -95,3 +95,45 @@ export const doLoadTableCourses = () => dispatch => {
     dispatch(loadTableCourseFaild());
   });
 };
+
+export const courseAdded = createAction('COURSE_ADDED');
+export const courseRemoved = createAction('COURSE_REMOVED');
+
+export const doAddCourse = (code) => dispatch => {
+  dispatch(courseAdded(code));
+
+  tableDatabase.migrate();
+
+  tableDatabase.addUserCourse(code, store.getState().appUser.id, store.getState().appUser.possible_organization_code).then( () => {
+    dispatch(doLoadTableCourses());
+
+  }).catch( (e) => {
+  });
+};
+
+export const doRemoveCourse = (code) => dispatch => {
+  dispatch(courseRemoved(code));
+
+  tableDatabase.migrate();
+
+  tableDatabase.removeUserCourse(code, store.getState().appUser.id, store.getState().appUser.possible_organization_code).then( () => {
+    dispatch(doLoadTableCourses());
+
+  }).catch( (e) => {
+  });
+};
+
+export const searchCourse = createAction('SEARCH_COURSE');
+export const courseSearchResultReceived = createAction('COURSE_SEARCH_RESULT_RECEIVED');
+
+export const doSearchCourse = (query) => dispatch => {
+  dispatch(searchCourse(query));
+
+  courseDatabase.migrate();
+
+  courseDatabase.searchCourse(query).then( (courses) => {
+    dispatch(courseSearchResultReceived(courses));
+
+  }).catch( (e) => {
+  });
+};

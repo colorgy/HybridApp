@@ -89,6 +89,21 @@ export default handleActions({
     };
   },
 
+  SEARCH_COURSE: (state, action) => {
+    return {
+      ...state,
+      courseSearchQuery: action.payload
+    };
+  },
+
+  COURSE_SEARCH_RESULT_RECEIVED: (state, action) => {
+    return {
+      ...state,
+      courseSearchResult: action.payload,
+      courseSearchResultHash: (new Date()).getTime()
+    };
+  },
+
   LOGOUT: (state, action) => {
     return defaultState;
   }

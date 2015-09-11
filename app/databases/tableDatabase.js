@@ -168,7 +168,7 @@ tableDatabase.syncUserCourses = (userID, orgCode, year = colorgyAPI.getCurrentYe
 tableDatabase.findUserCourses = (userID, orgCode, year = colorgyAPI.getCurrentYear(), term = colorgyAPI.getCurrentTerm()) => {
 
   return new Promise( (resolve, reject) => {
-    tableDatabase.executeSql("SELECT * FROM user_courses WHERE user_id = ? AND course_organization_code = ? AND year = ? AND term = ?", [userID, orgCode, year, term]).then( (r) => {
+    tableDatabase.executeSql("SELECT * FROM user_courses WHERE user_id = ? AND course_organization_code = ? AND year = ? AND term = ? AND deleted_at IS NULL", [userID, orgCode, year, term]).then( (r) => {
       var userCourses = [];
       if (r.results.rows.length) {
         for (let i=0; i<r.results.rows.length; i++) {
@@ -193,6 +193,37 @@ tableDatabase.findCourses = (userID, orgCode, year = colorgyAPI.getCurrentYear()
       }).catch( (e) => {
         reject(e);
       });
+
+    }).catch( (e) => {
+      reject(e);
+    });
+  });
+}
+
+tableDatabase.addUserCourse = (code, userID, orgCode, year = colorgyAPI.getCurrentYear(), term = colorgyAPI.getCurrentTerm()) => {
+
+  var uuid = `${userID}-${year}-${term}-${orgCode}-${code}`;
+
+  return new Promise( (resolve, reject) => {
+    tableDatabase.executeSql('DELETE FROM user_courses WHERE user_id = ? AND year = ? AND term = ? AND course_organization_code = ? AND course_code = ?', [userID, year, term, orgCode, code]).then( (r) => {
+      tableDatabase.executeSql('INSERT INTO user_courses (uuid, user_id, year, term, course_organization_code, course_code) VALUES (?, ?, ?, ?, ?, ?)', [uuid, userID, year, term, orgCode, code]).then( (r) => {
+        resolve();
+      }).catch( (e) => {
+        reject(e);
+      });
+
+    }).catch( (e) => {
+      reject(e);
+    });
+  });
+}
+
+tableDatabase.removeUserCourse = (code, userID, orgCode, year = colorgyAPI.getCurrentYear(), term = colorgyAPI.getCurrentTerm()) => {
+  var now = (new Date()).getTime();
+
+  return new Promise( (resolve, reject) => {
+    tableDatabase.executeSql('UPDATE user_courses SET deleted_at = ? WHERE user_id = ? AND year = ? AND term = ? AND course_organization_code = ? AND course_code = ?', [now, userID, year, term, orgCode, code]).then( (r) => {
+      resolve();
 
     }).catch( (e) => {
       reject(e);

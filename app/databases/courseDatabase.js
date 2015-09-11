@@ -272,6 +272,52 @@ courseDatabase.getPeriodData = (returnObject = false) => {
   });
 }
 
+function parseCourseRows (rows, periodData) {
+  var courses = {};
+
+  for (let i=0; i<rows.length; i++) {
+    let row = rows.item(i);
+    row.fullSemester = row.full_semester;
+    row.studentsEnrolled = row.students_enrolled;
+    let times = [];
+    for (let i=1; i<10; i++) {
+      if (row[`day_${i}`] && row[`period_${i}`]) {
+        let day = '';
+        let periodCode = '';
+        switch (row[`day_${i}`]) {
+          case 1:
+            day = 'Mon';
+            break;
+          case 2:
+            day = 'Tue';
+            break;
+          case 3:
+            day = 'Wed';
+            break;
+          case 4:
+            day = 'Thu';
+            break;
+          case 5:
+            day = 'Fri';
+            break;
+          case 6:
+            day = 'Sat';
+            break;
+          case 7:
+            day = 'Mon';
+            break;
+        }
+        if (periodData[row[`period_${i}`]]) periodCode = periodData[row[`period_${i}`]].code
+        times.push(day + periodCode);
+      }
+    }
+    row.times = times.join(' ');
+    courses[row.code] = row;
+  }
+
+  return courses;
+}
+
 courseDatabase.findCourses = (courseCodes) => {
   if (typeof courseCodes === 'string') courseCodes = [courseCodes];
 
@@ -280,45 +326,7 @@ courseDatabase.findCourses = (courseCodes) => {
       courseDatabase.executeSql(`SELECT * FROM courses WHERE code IN ('${courseCodes.join("', '")}')`).then( (r) => {
         var courses = {};
         if (r.results.rows.length) {
-          for (let i=0; i<r.results.rows.length; i++) {
-            let row = r.results.rows.item(i);
-            row.fullSemester = row.full_semester;
-            row.studentsEnrolled = row.students_enrolled;
-            let times = [];
-            for (let i=1; i<10; i++) {
-              if (row[`day_${i}`] && row[`period_${i}`]) {
-                let day = '';
-                let periodCode = '';
-                switch (row[`day_${i}`]) {
-                  case 1:
-                    day = 'Mon';
-                    break;
-                  case 2:
-                    day = 'Tue';
-                    break;
-                  case 3:
-                    day = 'Wed';
-                    break;
-                  case 4:
-                    day = 'Thu';
-                    break;
-                  case 5:
-                    day = 'Fri';
-                    break;
-                  case 6:
-                    day = 'Sat';
-                    break;
-                  case 7:
-                    day = 'Mon';
-                    break;
-                }
-                if (periodData[row[`period_${i}`]]) periodCode = periodData[row[`period_${i}`]].code
-                times.push(day + periodCode);
-              }
-            }
-            row.times = times.join(' ');
-            courses[row.code] = row;
-          }
+          courses = parseCourseRows(r.results.rows, periodData);
         }
         resolve(courses);
       }).catch( (e) => {
@@ -335,19 +343,24 @@ courseDatabase.findCourses = (courseCodes) => {
 courseDatabase.searchCourse = (query, courseYear = colorgyAPI.getCurrentYear(), courseTerm = colorgyAPI.getCurrentTerm()) => {
 
   return new Promise( (resolve, reject) => {
-    courseDatabase.executeSql(`SELECT * FROM courses WHERE year = ${courseYear} AND term = ${courseTerm} AND search_keywords LIKE '%${query}%' LIMIT 100`).then( (r) => {
-      var courses = {};
-      if (r.results.rows.length) {
-        for (let i=0; i<r.results.rows.length; i++) {
-          let row = r.results.rows.item(i);
-          courses[row.code] = row;
+    courseDatabase.getPeriodData(true).then( (periodData) => {
+      courseDatabase.executeSql(`SELECT * FROM courses WHERE year = ${courseYear} AND term = ${courseTerm} AND search_keywords LIKE '%${query}%' LIMIT 12`).then( (r) => {
+        var courses = {};
+        if (r.results.rows.length) {
+          for (let i=0; i<r.results.rows.length; i++) {
+            courses = parseCourseRows(r.results.rows, periodData);
+          }
         }
-      }
-      resolve(courses);
+        resolve(courses);
+      }).catch( (e) => {
+        console.error(e);
+        reject(e);
+      });
+
     }).catch( (e) => {
       console.error(e);
       reject(e);
-    })
+    });
   });
 }
 
