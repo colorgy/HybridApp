@@ -7,20 +7,20 @@ export default React.createClass({
   getDetails() {
     var details = [];
 
+    if (this.props.url) {
+      details.push(<FlatButton secondary key="url" onTouchTap={() => window.open(this.props.url, '_system')}>前往課程網頁</FlatButton>);
+    }
+
+    if (this.props.website) {
+      details.push(<FlatButton secondary key="website" onTouchTap={() => window.open(this.props.website, '_system')}>前往課程網站</FlatButton>);
+    }
+
     if (this.props.introduction) {
       details.push(<p key="introduction">課程簡介：{this.props.introduction}</p>);
     }
 
-    if (this.props.url) {
-      details.push(<p key="url">課程網址：{this.props.url}</p>);
-    }
-
     if (this.props.prerequisites) {
       details.push(<p key="prerequisites">預備知識：{this.props.prerequisites}</p>);
-    }
-
-    if (this.props.website) {
-      details.push(<p key="website">課程網站：{this.props.website}</p>);
     }
 
     if (this.props.studentsEnrolled) {
@@ -113,12 +113,12 @@ export default React.createClass({
             </div>
           </div>
         </CardTitle>
-        <CardText expandable={true}>
+        <CardText expandable={true} style={{ borderTop: 'solid 1px rgba(200,200,200, .3)' }}>
           {this.getDetails()}
         </CardText>
-        <CardActions style={{ textAlign: 'right' }}>
-          <FlatButton label="詳細資料" onTouchTap={this.handleDetailsClick} onClick={this.handleDetailsClick} />
-          <FlatButton label={this.props.selected ? '移除' : '加入'} onTouchTap={this.handleActionsClick} onClick={this.handleActionsClick} />
+        <CardActions style={{ borderTop: 'solid 1px rgba(200,200,200, .3)', textAlign: 'right' }}>
+          <FlatButton secondary label="詳細資料" onTouchTap={this.handleDetailsClick}/>
+          <FlatButton labelStyle={{ color: (this.props.selected ? 'red' : 'green') }} label={this.props.selected ? '移除選課' : '加入選課'} onTouchTap={this.handleActionsClick}/>
         </CardActions>
       </Card>
     );

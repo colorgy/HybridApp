@@ -22,7 +22,7 @@ var MyCoursesPage = React.createClass({
     if (!this.props.courses) return [];
 
     let courses = this.props.courses;
-    return Object.keys(courses).map( (k) => courses[k] ).map( (course) => (<CourseCard selected={true} {...course} onSelectRemove={this.handleCourseRemove} />));
+    return Object.keys(courses).map( (k) => courses[k] ).map( (course) => (<div style={{ margin: '10px 10px 12px' }}><CourseCard selected={true} {...course} onSelectRemove={this.handleCourseRemove} /></div>));
   },
 
   render() {

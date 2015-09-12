@@ -341,10 +341,16 @@ courseDatabase.findCourses = (courseCodes) => {
 }
 
 courseDatabase.searchCourse = (query, courseYear = colorgyAPI.getCurrentYear(), courseTerm = colorgyAPI.getCurrentTerm()) => {
+  query = query.replace(/[ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˊˇˋ˙]/mg, '')
 
   return new Promise( (resolve, reject) => {
+    if (query.length < 2) {
+      resolve({});
+      return;
+    }
+
     courseDatabase.getPeriodData(true).then( (periodData) => {
-      courseDatabase.executeSql(`SELECT * FROM courses WHERE year = ${courseYear} AND term = ${courseTerm} AND search_keywords LIKE '%${query}%' LIMIT 12`).then( (r) => {
+      courseDatabase.executeSql(`SELECT * FROM courses WHERE year = ${courseYear} AND term = ${courseTerm} AND search_keywords LIKE '%${query}%' LIMIT 25`).then( (r) => {
         var courses = {};
         if (r.results.rows.length) {
           for (let i=0; i<r.results.rows.length; i++) {

@@ -29,7 +29,7 @@ var CoursesPage = React.createClass({
     let selectedCourseCodes = Object.keys(this.props.courses);
 
     let courses = this.props.searchResult;
-    return Object.keys(courses).map( (k) => courses[k] ).map( (course) => (<CourseCard selected={selectedCourseCodes.indexOf(course.code) >= 0} {...course} onSelectRemove={this.handleCourseRemove} onSelectAdd={this.handleCourseAdd} />));
+    return Object.keys(courses).map( (k) => courses[k] ).map( (course) => (<div style={{ margin: '10px 10px 12px' }}><CourseCard selected={selectedCourseCodes.indexOf(course.code) >= 0} {...course} onSelectRemove={this.handleCourseRemove} onSelectAdd={this.handleCourseAdd} /></div>));
   },
 
   render() {
