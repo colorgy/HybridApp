@@ -9,6 +9,8 @@ import store from './store';
 window.injectTapEventPlugin = require("react-tap-event-plugin");
 injectTapEventPlugin();
 
+if (typeof cordova !== 'undefined' && cordova.InAppBrowser) window.open = cordova.InAppBrowser.open;
+
 import './theme';
 import App from './containers/App';
 
