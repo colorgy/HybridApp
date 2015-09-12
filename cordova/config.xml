@@ -28,6 +28,10 @@
         <allow-intent href="itms-apps:*" />
     </platform>
     <preference name="DisallowOverscroll" value="true" />
+    <plugin name="cordova-plugin-crosswalk-webview" spec="~1.3.0" />
     <plugin name="cordova-plugin-statusbar" spec="~1.0.1" />
     <plugin name="io.litehelpers.cordova.sqlite" spec="~0.7.7" />
+    <preference name="xwalkVersion" value="14+" />
+    <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect" />
+    <preference name="xwalkMode" value="embedded" />
 </widget>

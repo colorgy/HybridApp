@@ -1,6 +1,7 @@
 import React from 'react';
 import { Styles, IconMenu, SvgIcon } from 'material-ui';
 let MenuItem = require('material-ui/lib/menus/menu-item');
+let MenuDivider = require('material-ui/lib/menus/menu-divider');
 
 export default React.createClass({
 
@@ -58,7 +59,13 @@ export default React.createClass({
               right: '0',
               top: top
             }}>
-            <MenuItem onClick={this.props.onMenuItemClick.bind(this, 'logout')} primaryText="登出" />
+            <MenuItem onTouchTap={() => window.open('https://colorgy.io', '_system')} primaryText="前往 Colorgy 網站" />
+            <MenuItem onTouchTap={() => window.open('https://www.facebook.com/Colorgy-1529686803975150/', '_system')} primaryText="前往 Colorgy FB 專頁" />
+            <MenuDivider />
+            <MenuItem onTouchTap={this.props.onMenuItemClick.bind(this, 'logout')} primaryText="登出" />
+            <MenuDivider />
+            <MenuItem onTouchTap={() => window.open('https://github.com/colorgy/HybridApp', '_system')} primaryText="到 GitHub 查看原始碼" />
+            <MenuItem onTouchTap={() => window.open('https://github.com/colorgy/HybridApp/issues', '_system')} primaryText="查看／回報 issues" />
           </IconMenu>
         </div>
       </div>
