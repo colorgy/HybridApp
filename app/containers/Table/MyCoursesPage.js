@@ -9,8 +9,6 @@ import CourseCard from '../../components/CourseCard';
 var MyCoursesPage = React.createClass({
 
   componentWillMount() {
-    this.props.dispatch(doSyncUserCourses());
-    this.props.dispatch(doLoadTableCourses());
   },
 
   componentWillBeVisibleOnPageRouter() {
@@ -52,6 +50,18 @@ var MyCoursesPage = React.createClass({
   }
 });
 
+var MyCoursesPagePreloadPlaceholder = React.createClass({
+
+  render() {
+    return (
+      <PageWithBar hasBack pageRouterkey="table" style={this.props.style} title="我的課程">
+      </PageWithBar>
+    );
+  }
+});
+
 export default connect(state => ({
   courses: state.table.tableCourses
 }))(MyCoursesPage);
+
+export { MyCoursesPagePreloadPlaceholder };

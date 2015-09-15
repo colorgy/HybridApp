@@ -10,8 +10,8 @@ import { doSyncUserCourses, doLoadTableCourses, doUpdateCourseDatabase } from '.
 var TablePage = React.createClass({
 
   componentWillMount() {
-    this.props.dispatch(doSyncUserCourses());
-    this.props.dispatch(doLoadTableCourses());
+    // this.props.dispatch(doSyncUserCourses());
+    // this.props.dispatch(doLoadTableCourses());
   },
 
   componentWillBeVisibleOnPageRouter() {
@@ -62,7 +62,7 @@ var TablePage = React.createClass({
 
     return (
       <PageWithBar style={{ overflow: 'visiable' }} title={this.props.cid} actions={pageAction}>
-        <CourseTable periods={this.props.periodData} events={courseEvents} style={{ position: 'absolute', top: getBarHeight(), bottom: getAppTabHeight(), width: '100%' }} />
+        <CourseTable periods={this.props.periodData} events={courseEvents} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} />
       </PageWithBar>
     );
   },

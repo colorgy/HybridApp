@@ -28,11 +28,11 @@ export default React.createClass({
   getStyle() {
     return {
       boxSizing: 'border-box',
+      position: 'relative',
       height: '100%',
       paddingTop: getBarHeight(),
       paddingBottom: getAppTabHeight(),
-      overflow: 'auto',
-      WebkitOverflowScrolling: 'touch',
+      overflow: 'hidden',
       ...this.props.style
     }
   },
@@ -45,7 +45,7 @@ export default React.createClass({
     }
 
     return {
-      position: 'fixed',
+      position: 'absolute',
       top: 0,
       paddingTop: paddingTop
     }
@@ -95,7 +95,18 @@ export default React.createClass({
           iconElementLeft={this.getIconElementLeft()}
           iconElementRight={this.getIconElementRight()}
           style={barStyle} />
-        {this.props.children}
+        <div style={{
+            position: 'absolute',
+            width: '100%',
+            left: 0,
+            right: 0,
+            top: getBarHeight(),
+            bottom: getAppTabHeight(),
+            overflow: 'auto',
+            WebkitOverflowScrolling: 'touch',
+          }}>
+          {this.props.children}
+        </div>
       </div>
     );
   },

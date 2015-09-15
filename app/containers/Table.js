@@ -6,7 +6,7 @@ import PageRouter, { Route } from '../components/PageRouter';
 import CenteredPage from '../components/CenteredPage';
 import TablePage from './Table/TablePage';
 import CoursePage from './Table/CoursePage';
-import MyCoursesPage from './Table/MyCoursesPage';
+import MyCoursesPage, { MyCoursesPagePreloadPlaceholder } from './Table/MyCoursesPage';
 import CoursesPage from './Table/CoursesPage';
 import UserPage from './Table/UserPage';
 
@@ -73,7 +73,7 @@ var Table = React.createClass({
         <PageRouter history={this.props.routerHistroy}>
           <Route path="/" handler={TablePage} />
           <Route path="/courses" handler={CoursesPage} />
-          <Route path="/me/courses" handler={MyCoursesPage} />
+          <Route path="/me/courses" handler={MyCoursesPage} preloadPlaceholder={MyCoursesPagePreloadPlaceholder} />
           <Route path="/courses/:code" handler={CoursePage} />
           <Route path="/users/:username" handler={UserPage} />
         </PageRouter>

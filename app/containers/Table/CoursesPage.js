@@ -9,13 +9,15 @@ import CourseCard from '../../components/CourseCard';
 var CoursesPage = React.createClass({
 
   componentWillMount() {
-    this.props.dispatch(doSyncUserCourses());
-    this.props.dispatch(doLoadTableCourses());
   },
 
   componentWillBeVisibleOnPageRouter() {
     this.props.dispatch(doSyncUserCourses());
     this.props.dispatch(doLoadTableCourses());
+
+    if (!this.state.searchQuery) {
+      React.findDOMNode(this.refs.searchInput).focus();
+    }
   },
 
   getInitialState() {
@@ -54,6 +56,7 @@ var CoursesPage = React.createClass({
             }}
             placeholder="搜尋課名、老師姓名或課程代碼"
             value={this.state.searchQuery}
+            ref="searchInput"
             onChange={this.handleSearchQueryChange} />
         </Toolbar>
         {this.getCourseCards()}

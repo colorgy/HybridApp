@@ -292,7 +292,7 @@ var CourseTable = React.createClass({
 
   getInitialState() {
     return {
-      activeColumn: (new Date()).getDay()
+      activeColumn: ((new Date()).getDay() == 0) ? 7 : (new Date()).getDay()
     };
   },
 
