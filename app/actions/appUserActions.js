@@ -56,7 +56,7 @@ export const doLogin = userCredentials => dispatch => {
       }
     })
     .catch(reason => {
-      dispatch(loginFailed(reason));
+      dispatch(loginFailed({ error: 'request_error' }));
     });
 };
 

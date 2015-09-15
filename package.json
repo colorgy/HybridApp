@@ -26,9 +26,11 @@
     "qs": "^5.0.0",
     "react": "^0.13.3",
     "react-async": "^2.1.0",
+    "react-flipcard": "^0.1.2",
     "react-redux": "^0.9.0",
     "react-router": "^0.13.3",
     "react-router-component": "^0.26.0",
+    "react-swipe": "^2.3.0",
     "react-tap-event-plugin": "^0.1.7",
     "react-tappable": "^0.6.0",
     "reapp": "^0.8.28",
@@ -39,6 +41,7 @@
     "redux-thunk": "^0.1.0",
     "reselect": "0.0.2",
     "sass-loader": "^2.0.1",
+    "swipe-js-iso": "^2.0.1",
     "url-pattern": "^0.10.0"
   },
   "devDependencies": {

@@ -37,3 +37,31 @@ body, #app {
   transition: all .28s ease;
   pointer-events: none;
 }
+
+.LoginSwipe,
+.LoginSwipe > div,
+.LoginSwipe > div > div,
+.LoginSwipe > div > div > div {
+  width: 100%;
+  height: 100%;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.flip-enter {
+  transform: rotate3d(0,1,0, -90deg) !important;
+}
+
+.flip-enter.flip-enter-active {
+  transform: rotate3d(0,1,0, 0) !important;
+  transition: transform .36s ease-out .36s !important;
+}
+
+.flip-leave {
+  transform: rotate3d(0,1,0, 0) !important;
+}
+
+.flip-leave.flip-leave-active {
+  transform: rotate3d(0,1,0, 90deg) !important;
+  transition: transform .36s ease-in !important;
+}

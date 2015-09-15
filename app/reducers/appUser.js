@@ -18,6 +18,7 @@ export default handleActions({
   LOGIN_SUCCESS: (state, action) => {
     return {
       isLogin: false,  // this should be set to true only until APP_USER_INITIAL_DATA_UPDATE_DONE
+      loggingIn: true,
       accessToken: action.payload
     };
   },
@@ -25,7 +26,8 @@ export default handleActions({
   APP_USER_INITIAL_DATA_UPDATE_DONE: (state, action) => {
     return {
       ...state,
-      isLogin: true
+      isLogin: true,
+      loggingIn: false
     };
   },
 
