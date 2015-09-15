@@ -21,9 +21,13 @@
     <allow-navigation href="*://*.clg.io/*" />
     <allow-navigation href="data:*" />
     <platform name="android">
+        <icon src="www/android-app-icon.png" />
+        <splash src="www/app-screen.png" />
         <allow-intent href="market:*" />
     </platform>
     <platform name="ios">
+        <icon src="www/ios-app-icon.png" />
+        <splash src="www/app-screen.png" />
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
