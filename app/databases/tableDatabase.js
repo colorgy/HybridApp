@@ -137,7 +137,7 @@ tableDatabase.syncUserCourses = (userID, orgCode, year = colorgyAPI.getCurrentYe
 
         var localUpdatePromise = new Promise( (resolve, reject) => {
           tableDatabase.executeSql("DELETE FROM user_courses WHERE user_id = ? AND course_organization_code = ? AND year = ? AND term = ?", [userID, orgCode, year, term])
-            .then( () => tableDatabase.executeSql(insertSQL) )
+            .then( () => insertSQLValues.length ? tableDatabase.executeSql(insertSQL) : true )
             .then( () => {
               resolve();
             })

@@ -47,6 +47,7 @@ export const doUpdateCourseDatabase = (courseYear = colorgyAPI.getCurrentYear(),
       if (e === 404) {
         dispatch(organizationHasNoCourseData());
       } else {
+        console.error(e);
         dispatch(courseDatabaseUpdateFaild(e));
       }
     });
@@ -88,10 +89,12 @@ export const doLoadTableCourses = () => dispatch => {
     tableDatabase.findCourses(store.getState().appUser.id, store.getState().appUser.possible_organization_code).then(function (courses) {
       dispatch(tableCourseLoaded({ courses: courses, periodData: periodData }));
     }).catch( (e) => {
+      console.error(e);
       dispatch(loadTableCourseFaild());
     });
 
   }).catch( (e) => {
+    console.error(e);
     dispatch(loadTableCourseFaild());
   });
 };

@@ -13,10 +13,8 @@ var AppNav = React.createClass({
   },
 
   menuItems: [
-    { route: 'about', text: 'About' },
-    { route: 'license', text: 'License' },
-    { type: MenuItem.Types.SUBHEADER, text: 'More' },
-    { action: 'logout', text: 'Logout' }
+    { type: MenuItem.Types.SUBHEADER, text: '個人選項' },
+    { action: 'logout', text: '登出' }
   ],
 
   toggle() {

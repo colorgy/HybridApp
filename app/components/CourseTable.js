@@ -187,7 +187,7 @@ var CourseTableColumn = React.createClass({
       for (let i=1; i<=periodCount; i++) {
         let period = this.props.periods[i];
 
-        let periodStartTime = period.time.split('-')[0];
+        let periodStartTime = period.time ? period.time.split('-')[0] : '';
 
         marks.push(
           <div style={{
