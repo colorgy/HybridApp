@@ -4,6 +4,7 @@ import { doSyncUserCourses, doLoadTableCourses, doUpdateCourseDatabase, doRemove
 import { pageNavigateTo, pageNavigateBack } from '../../components/PageRouter';
 import { Card, CardHeader, Avatar, RaisedButton, IconButton, SvgIcon } from 'material-ui';
 import PageWithBar from '../../components/PageWithBar';
+import CenteredPage from '../../components/CenteredPage';
 import CourseCard from '../../components/CourseCard';
 
 var MyCoursesPage = React.createClass({
@@ -17,9 +18,12 @@ var MyCoursesPage = React.createClass({
   },
 
   getMyCourseCards() {
-    if (!this.props.courses) return [];
-
     let courses = this.props.courses;
+
+    if (!courses || !Object.keys(courses).length) return (<CenteredPage>
+      <p>您在本學期尚未選擇任何課程，按下右上角的「＋」來加課吧！</p>
+    </CenteredPage>);
+
     return Object.keys(courses).map( (k) => courses[k] ).map( (course) => (<div style={{ margin: '10px 10px 12px' }}><CourseCard selected={true} {...course} onSelectRemove={this.handleCourseRemove} /></div>));
   },
 
@@ -55,6 +59,9 @@ var MyCoursesPagePreloadPlaceholder = React.createClass({
   render() {
     return (
       <PageWithBar hasBack pageRouterkey="table" style={this.props.style} title="我的課程">
+        <CenteredPage>
+          <p>載入中</p>
+        </CenteredPage>
       </PageWithBar>
     );
   }

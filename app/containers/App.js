@@ -69,9 +69,7 @@ var App = React.createClass({
 
           <AppTab onTabChange={this.handleTabChange}>
             <Tab name="table" displayedName="Table" handler={Table} />
-            <Tab name="chat" displayedName="Chat" handler={Chat} />
             <Tab name="about" displayedName="About" handler={About} />
-            <Tab name="license" displayedName="License" handler={License} />
           </AppTab>
 
           <LogoutDialog
