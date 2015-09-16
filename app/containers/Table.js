@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { RaisedButton, LinearProgress } from 'material-ui';
 import tableActions, { checkCourseDatabase, initialize, doUpdateCourseDatabase } from '../actions/tableActions';
 import PageRouter, { Route } from '../components/PageRouter';
+import PageWithBar from '../components/PageWithBar';
 import CenteredPage from '../components/CenteredPage';
 import TablePage from './Table/TablePage';
 import CoursePage from './Table/CoursePage';
@@ -21,39 +22,55 @@ var Table = React.createClass({
     // Initializing
     if (!this.props.checkCourseDatabaseDone) {
       return (
-        <CenteredPage adjustForAppTab>
-          <div>載入中...</div>
-        </CenteredPage>
+        <PageWithBar>
+          <CenteredPage>
+            <div>載入中...</div>
+          </CenteredPage>
+        </PageWithBar>
       );
 
     // Downloading initial data
     } else if (this.props.courseDatabaseUpdating && !this.props.courseDatabaseUpdatedAt) {
+      var progressMode = 'indeterminate';
+      var progress = this.props.courseDatabaseUpdatingProgress;
+
+      if (progress) {
+        progressMode = 'determinate';
+        progress = parseInt(progress * 100);
+      }
+
       return (
-        <CenteredPage adjustForAppTab>
-          <div>
-            <p>正在下載您學校的課程資料，請稍候數秒...</p>
-            <LinearProgress mode="indeterminate" />
-          </div>
-        </CenteredPage>
+        <PageWithBar>
+          <CenteredPage>
+            <div>
+              <p>正在下載您學校的課程資料，請稍候數秒...</p>
+              <LinearProgress mode={progressMode} value={progress} />
+            </div>
+          </CenteredPage>
+        </PageWithBar>
       );
 
     // User has no organization
     } else if (this.props.userHasNoOrganization) {
       return (
-        <CenteredPage adjustForAppTab>
-          <div>您沒有選擇學校。</div>
-        </CenteredPage>
+        <PageWithBar>
+          <CenteredPage adjustForAppTab>
+            <div>您沒有選擇學校。</div>
+          </CenteredPage>
+        </PageWithBar>
       );
 
     // User's organization has no course data
     } else if (this.props.organizationHasNoCourseData) {
       return (
-        <CenteredPage adjustForAppTab>
-          <div>
-            <p>您的學校尚無課程資料。</p>
-            <RaisedButton label="重試" onTouchTap={ () => this.props.dispatch(doUpdateCourseDatabase()) } />
-          </div>
-        </CenteredPage>
+        <PageWithBar>
+          <CenteredPage>
+            <div>
+              <p>您的學校尚無課程資料，因此無法提供您服務。</p>
+              <RaisedButton label="再試一次" onTouchTap={ () => this.props.dispatch(doUpdateCourseDatabase()) } />
+            </div>
+          </CenteredPage>
+        </PageWithBar>
       );
 
     // The initial data download has faild
@@ -61,7 +78,7 @@ var Table = React.createClass({
       return (
         <CenteredPage adjustForAppTab>
           <div>
-            <p>課程資料更新失敗。</p>
+            <p>課程資料下載失敗。</p>
             <RaisedButton label="重試" onTouchTap={ () => this.props.dispatch(doUpdateCourseDatabase()) } />
           </div>
         </CenteredPage>
@@ -82,10 +99,11 @@ var Table = React.createClass({
   }
 });
 
-export default connect(state => ({
+export default connect((state) => ({
   routerHistroy: state.pageRouter.tableHistory,
   checkCourseDatabaseDone: state.table.checkCourseDatabaseDone,
   courseDatabaseUpdating: state.table.courseDatabaseUpdating,
+  courseDatabaseUpdatingProgress: state.table.courseDatabaseUpdatingProgress,
   courseDatabaseUpdateSuccess: state.table.courseDatabaseUpdateSuccess,
   courseDatabaseUpdatedAt: state.table.courseDatabaseUpdatedAt,
   userHasNoOrganization: state.table.userHasNoOrganization,

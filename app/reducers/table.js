@@ -27,7 +27,15 @@ export default handleActions({
   UPDATE_COURSE_DATABASE: (state, action) => {
     return {
       ...state,
-      courseDatabaseUpdating: true
+      courseDatabaseUpdating: true,
+      courseDatabaseUpdatingProgress: null
+    };
+  },
+
+  UPDATE_COURSE_DATABASE_PROCESSING: (state, action) => {
+    return {
+      ...state,
+      courseDatabaseUpdatingProgress: action.payload
     };
   },
 
@@ -38,7 +46,8 @@ export default handleActions({
       courseDatabaseUpdateSuccess: true,
       courseDatabaseUpdatedAt: action.payload,
       userHasNoOrganization: false,
-      organizationHasNoCourseData: false
+      organizationHasNoCourseData: false,
+      courseDatabaseUpdatingProgress: null
     };
   },
 
@@ -46,7 +55,8 @@ export default handleActions({
     return {
       ...state,
       courseDatabaseUpdating: false,
-      courseDatabaseUpdateSuccess: false
+      courseDatabaseUpdateSuccess: false,
+      courseDatabaseUpdatingProgress: null
     };
   },
 

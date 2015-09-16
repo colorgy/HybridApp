@@ -7,7 +7,7 @@ var migartions = {
   '2.1': 'CREATE TABLE courses(ID INTEGER PRIMARY KEY, code CHARACTER(255), general_code CHARACTER(255), full_semester TINYINT, year SMALLINT, term TINYINT, name CHARACTER(255), name_en CHARACTER(255), lecturer CHARACTER(255), credits TINYINT, required TINYINT, url CHARACTER(255), website CHARACTER(255), prerequisites CHARACTER(255), day_1 TINYINT, day_2 TINYINT, day_3 TINYINT, day_4 TINYINT, day_5 TINYINT, day_6 TINYINT, day_7 TINYINT, day_8 TINYINT, day_9 TINYINT, period_1 TINYINT, period_2 TINYINT, period_3 TINYINT, period_4 TINYINT, period_5 TINYINT, period_6 TINYINT, period_7 TINYINT, period_8 TINYINT, period_9 TINYINT, location_1 CHARACTER(255), location_2 CHARACTER(255), location_3 CHARACTER(255), location_4 CHARACTER(255), location_5 CHARACTER(255), location_6 CHARACTER(255), location_7 CHARACTER(255), location_8 CHARACTER(255), location_9 CHARACTER(255), students_enrolled SMALLINT);',
   '2.2': 'ALTER TABLE courses ADD COLUMN search_keywords TEXT;',
   '2.3': 'CREATE TABLE period_data("order" INTEGER PRIMARY KEY, code CHARACTER(255), time CHARACTER(255));'
-}
+};
 
 if (window.sqlitePlugin) {
   var courseDatabase = new WebSQL(null, null, null, migartions, sqlitePlugin, { name: 'course.db', location: 2 });
@@ -17,22 +17,25 @@ if (window.sqlitePlugin) {
 
 courseDatabase.migrate();
 
-courseDatabase.updateData = (orgCode, courseYear = colorgyAPI.getCurrentYear(), courseTerm = colorgyAPI.getCurrentTerm()) => {
+courseDatabase.updateData = (orgCode, courseYear = colorgyAPI.getCurrentYear(), courseTerm = colorgyAPI.getCurrentTerm(), progressCallback) => {
   var sqlValue = courseDatabase.sqlValue;
 
   return new Promise( (updateResolve, updateReject) => {
 
     var requestPromises = [];
+    var remainingPages = 100;
 
     function requestAndSaveCourses(url, iterateDoneCallback = () => {}, firstRequest = true) {
       // Fire request then deal with it
-      var request = colorgyAPI.request({ url: url }).then( (response) => {
+      var request = colorgyAPI.request({ url: url }).then((response) => {
 
         // If the organization has no course data
         if (response.status == 404) {
           updateReject(404);
 
         } else {
+          if (firstRequest) remainingPages = parseInt(response.headers['x-pages-count']);
+          var totalPages = parseInt(response.headers['x-pages-count']);
           // Iterate through each next page
           if (response.headers.link) {
             var nextURLMatch = response.headers.link.match(/<([^>]+)>; ?rel="next"/);
@@ -146,11 +149,17 @@ courseDatabase.updateData = (orgCode, courseYear = colorgyAPI.getCurrentYear(), 
           return new Promise( (resolve, reject) => {
             courseDatabase.executeSql(insertSQL)
               .then( () => {
+                remainingPages--;
+                let progress = (totalPages - remainingPages) / totalPages;
+                if (progressCallback) progressCallback(progress);
+
                 resolve();
+
               }).catch( (e) => {
                 console.error(e);
                 updateReject(e);
               });
+
           }).catch( (e) => {
             console.error(e);
             updateReject(e);
@@ -167,7 +176,7 @@ courseDatabase.updateData = (orgCode, courseYear = colorgyAPI.getCurrentYear(), 
 
     // Clear the database and fire first request
     var firstRequestPromise = new Promise( (resolve, reject) => {
-      let sql = `DELETE FROM courses WHERE year = ${courseYear} AND term = ${courseTerm}`;
+      const sql = `DELETE FROM courses WHERE year = ${courseYear} AND term = ${courseTerm}`;
       console.log(sql);
       courseDatabase.executeSql(sql)
         .then(function () {
@@ -177,11 +186,9 @@ courseDatabase.updateData = (orgCode, courseYear = colorgyAPI.getCurrentYear(), 
 
     // Get period data
     var periodDataRequestPromise = new Promise( (resolve, reject) => {
-      let sql = `DELETE FROM period_data`;
-      console.log(sql);
-      courseDatabase.executeSql(sql)
+      courseDatabase.executeSql('DELETE FROM period_data')
         .then( () => {
-          let url = `/${orgCode.toLowerCase()}/period_data?per_page=500`;
+          const url = `/${orgCode.toLowerCase()}/period_data?per_page=500`;
           colorgyAPI.request({ url: url }).then( (response) => {
 
             // If the organization has no course data
@@ -228,15 +235,44 @@ courseDatabase.updateData = (orgCode, courseYear = colorgyAPI.getCurrentYear(), 
     // Wait for all request to be done, then resolve the update
     firstRequestPromise.then( () => {
       Promise.all(requestPromises).then( () => {
-        courseDatabase.executeSql("INSERT OR REPLACE INTO info (ID, key, value) VALUES ((SELECT ID FROM info WHERE key = 'current_courses_updated_at'), 'current_courses_updated_at' ," + (new Date()).getTime() + ")");
+        courseDatabase.executeSql(`INSERT OR REPLACE INTO info (ID, key, value) VALUES ((SELECT ID FROM info WHERE key = '${courseYear}_${courseTerm}_courses_updated_at'), '${courseYear}_${courseTerm}_courses_updated_at' ,` + (new Date()).getTime() + ")");
         updateResolve();
+
+      }).catch( (e) => {
+        console.error(e);
+        updateReject(e);
       });
+
     }).catch( (e) => {
       console.error(e);
       updateReject(e);
     });
   });
 };
+
+courseDatabase.getDataUpdatedTime = (courseYear = colorgyAPI.getCurrentYear(), courseTerm = colorgyAPI.getCurrentTerm()) => {
+  return courseDatabase.executeSql(`SELECT * FROM info WHERE key = '${courseYear}_${courseTerm}_courses_updated_at'`).then((r) => {
+    if (!r.results.rows.length) return null;
+    return parseInt(r.results.rows.item(0).value);
+  });
+};
+
+// courseDatabase.updateDataIfOlderThen = (seconds, orgCode, courseYear = colorgyAPI.getCurrentYear(), courseTerm = colorgyAPI.getCurrentTerm()) => {
+//   return new Promise( (resolve, reject) => {
+//     courseDatabase.getDataUpdatedTime(courseYear, courseTerm).then((updatedTime) => {
+//       if (updatedTime) resolve();
+
+//       if (!updatedTime || ((new Date()).getTime() - updatedTime) / 1000 > seconds) {
+//         courseDatabase.updateData(orgCode, courseYear, courseTerm).then(() => {
+//           if (!updatedTime) resolve();
+//         }).catch((e) => {
+//           console.error(e);
+//           if (!updatedTime) reject(e);
+//         });
+//       }
+//     });
+//   });
+// };
 
 courseDatabase.getPeriodData = (returnObject = false) => {
 
@@ -268,9 +304,9 @@ courseDatabase.getPeriodData = (returnObject = false) => {
     }).catch( (e) => {
       console.error(e);
       reject(e);
-    })
+    });
   });
-}
+};
 
 function parseCourseRows (rows, periodData) {
   var courses = {};
@@ -307,7 +343,7 @@ function parseCourseRows (rows, periodData) {
             day = 'Mon';
             break;
         }
-        if (periodData[row[`period_${i}`]]) periodCode = periodData[row[`period_${i}`]].code
+        if (periodData[row[`period_${i}`]]) periodCode = periodData[row[`period_${i}`]].code;
         times.push(day + periodCode);
       }
     }
@@ -319,7 +355,9 @@ function parseCourseRows (rows, periodData) {
 }
 
 courseDatabase.findCourses = (courseCodes) => {
-  if (typeof courseCodes === 'string') courseCodes = [courseCodes];
+  if (typeof courseCodes === 'string') {
+    courseCodes = [courseCodes];
+  }
 
   return new Promise( (resolve, reject) => {
     courseDatabase.getPeriodData(true).then( (periodData) => {
@@ -338,10 +376,10 @@ courseDatabase.findCourses = (courseCodes) => {
       reject(e);
     });
   });
-}
+};
 
 courseDatabase.searchCourse = (query, courseYear = colorgyAPI.getCurrentYear(), courseTerm = colorgyAPI.getCurrentTerm()) => {
-  query = query.replace(/[ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˊˇˋ˙]/mg, '')
+  query = query.replace(/[ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˊˇˋ˙]/mg, '');
 
   return new Promise( (resolve, reject) => {
     if (query.length < 2) {
@@ -368,7 +406,7 @@ courseDatabase.searchCourse = (query, courseYear = colorgyAPI.getCurrentYear(), 
       reject(e);
     });
   });
-}
+};
 
 window.courseDatabase = courseDatabase;
 
