@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch';
 import colorgyAPI from '../utils/colorgyAPI';
 import courseDatabase from '../databases/courseDatabase';
 import tableDatabase from '../databases/tableDatabase';
+import organizationDatabase from '../databases/organizationDatabase';
 
 import { createAction } from 'redux-actions';
 
@@ -21,9 +22,12 @@ function convertImgToBase64URL(url, callback, outputFormat){
   img.src = url;
 }
 
+export const initialize = createAction('APP_USER_INITIALIZE');
+
 export const loggingIn = createAction('LOGGING_IN');
 export const loginSuccess = createAction('LOGIN_SUCCESS');
 export const appUserInitialDataUpdateDone = createAction('APP_USER_INITIAL_DATA_UPDATE_DONE');
+export const appUserOrganizationDataMissing = createAction('APP_USER_ORGANIZATION_DATA_MISSING');
 export const loginFailed = createAction('LOGIN_FAILED');
 
 export const refreshAccessToken = createAction('REFRESH_ACCESS_TOKEN');
@@ -67,8 +71,52 @@ export const syncAppUserData = (initial = false) => dispatch => {
     dispatch(updateAppUserData(response.body));
     dispatch(downloadAppUserImage({ url: response.body.avatar_url, name: 'avatar' }));
     dispatch(downloadAppUserImage({ url: response.body.cover_photo_blur_url, name: 'coverPhoto' }));
-    dispatch(appUserInitialDataUpdateDone());
+    if (initial) {
+      if (response.body.possible_organization_code) {
+        dispatch(appUserInitialDataUpdateDone());
+      } else {
+        dispatch(doAppUserOrganizationDataMissing());
+      }
+    }
+  })
+    .catch( reason => {
+      console.error(reason);
+      if (initial) dispatch(loginFailed({ error: 'request_error' }));
+    });
+};
+
+export const organizationsLoad = createAction('APP_USER_LOGIN_ORGANIZATIONS_LOAD');
+
+export const doAppUserOrganizationDataMissing = () => dispatch => {
+  organizationDatabase.getOrganizations().then( organizations => {
+    dispatch(organizationsLoad(organizations));
+    dispatch(appUserOrganizationDataMissing());
+
+  }).catch( reason => {
+    console.error(reason);
+    dispatch(loginFailed({ error: 'request_error' }));
   });
+};
+
+export const departmentsLoad = createAction('APP_USER_LOGIN_DEPARTMENTS_LOAD');
+
+export const doLoadDepartments = (orgCode) => dispatch => {
+  organizationDatabase.getDepartments(orgCode).then( departments => {
+    dispatch(departmentsLoad(departments));
+
+  }).catch( reason => {
+    console.error(reason);
+    dispatch(loginFailed({ error: 'request_error' }));
+  });
+};
+
+export const setOrganization = createAction('APP_USER_LOGIN_SET_ORGANIZATION');
+
+export const doSetOrganization = (data) => dispatch => {
+  var { orgCode, depCode, year } = data;
+
+  dispatch(setOrganization(data));
+  dispatch(appUserInitialDataUpdateDone());
 };
 
 export const saveAppUserImage = createAction('SAVE_APP_USER_IMAGE');
@@ -76,13 +124,13 @@ export const saveAppUserImage = createAction('SAVE_APP_USER_IMAGE');
 export const downloadAppUserImage = payload => dispatch => {
   convertImgToBase64URL(payload.url, (base64Image) => {
     dispatch(saveAppUserImage({ name: payload.name, image: base64Image }));
-  })
-}
+  });
+};
 
 export const doLogout = payload => dispatch => {
   dispatch(logout());
   courseDatabase.reset();
   tableDatabase.reset();
-}
+};
 
 export const logout = createAction('LOGOUT');

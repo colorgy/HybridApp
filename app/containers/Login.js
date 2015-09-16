@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { doLogin } from '../actions/appUserActions';
+import { doLogin, doLoadDepartments, doSetOrganization } from '../actions/appUserActions';
 import ReactSwipe from 'react-swipe';
 import FlipCard from 'react-flipcard';
+import Select from 'react-select';
 import { Paper, Card, CardTitle, CardText, CardActions, FlatButton, RaisedButton, TextField, Snackbar, SvgIcon, LinearProgress } from 'material-ui';
 import CenteredPage from '../components/CenteredPage';
 
@@ -83,7 +84,55 @@ var Login = React.createClass({
 
     var content = '';
 
-    if (this.props.loggingIn) {
+    if (this.props.loggingIn && this.props.organizationDataMissing) {
+      var organizationOptions = (this.props.loginOrganizations || []).map( (org) => ({ value: org.code, label: `${org.code} ${org.name} (${org.shortName})` }) );
+      var departmentsOptions = (this.props.loginDepartments || []).map( (dep) => ({ value: dep.code, label: `${dep.name}` }) );
+      var yearOptions = [];
+      var currentYear = (new Date()).getFullYear();
+      for (let i=currentYear; i>(currentYear-12); i--) yearOptions.push({ value: i, label: `${i} 年` });
+
+      content = (<CenteredPage>
+        <Card zDepth={1} style={{ display: 'block', width: 'auto', height: 'auto', minWidth: 288 }}>
+          <CardTitle
+            title="選擇學校"
+            subtitle="請選擇您的學校與科系" />
+          <CardText>
+            <p>
+              <Select
+                value={this.state.orgCode}
+                options={organizationOptions}
+                clearable={false}
+                placeholder="輸入關鍵字尋找並選擇學校"
+                noResultsText="資料載入中，請稍候..."
+                onChange={this._handleOrganizationSelect}
+              />
+            </p>
+            <p>
+              <Select
+                value={this.state.year}
+                options={yearOptions}
+                placeholder="入學年度"
+                noResultsText="請先選擇學校，並稍等資料載入"
+                onChange={this._handleYearSelect}
+              />
+            </p>
+            <p>
+              <Select
+                value={this.state.depCode}
+                options={departmentsOptions}
+                placeholder="輸入關鍵字尋找並選擇系所"
+                noResultsText="請先選擇學校，並稍等資料載入"
+                onChange={this._handleDepartmentSelect}
+              />
+            </p>
+          </CardText>
+          <CardActions>
+            <FlatButton label="確定並繼續" primary={true} onTouchTap={this._handleOrganizationSet} />
+          </CardActions>
+        </Card>
+      </CenteredPage>);
+
+    } else if (this.props.loggingIn) {
       content = (<CenteredPage>
         <div style={{ width: 'auto', height: 'auto' }}>
           <p>登入中，請稍候...</p>
@@ -158,11 +207,31 @@ var Login = React.createClass({
         dispatch(loginFailed('facebook_failed'));
       }
     );
+  },
+
+  _handleOrganizationSelect(orgCode) {
+    this.setState({ orgCode: orgCode, depCode: null });
+    this.props.dispatch(doLoadDepartments(orgCode));
+  },
+
+  _handleYearSelect(year) {
+    this.setState({ year: year });
+  },
+
+  _handleDepartmentSelect(depCode) {
+    this.setState({ depCode: depCode });
+  },
+
+  _handleOrganizationSet() {
+    this.props.dispatch(doSetOrganization({ year: this.state.year, orgCode: this.state.orgCode, depCode: this.state.depCode }));
   }
 
 });
 
 export default connect(state => ({
   errorCode: state.appUser.errorCode,
-  loggingIn: state.appUser.loggingIn
+  loggingIn: state.appUser.loggingIn,
+  organizationDataMissing: state.appUser.organizationDataMissing,
+  loginOrganizations: state.appUser.loginOrganizations,
+  loginDepartments: state.appUser.loginDepartments
 }))(Login);

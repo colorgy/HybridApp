@@ -74,9 +74,11 @@ class WebSQL {
                     this.version = version;
                     resolve(this);
                   }, (t, e) => {
+                    console.error(e);
                     reject(e);
                   });
                 }, (t, e) => {
+                  console.error(e);
                   reject(e);
                 });
               });
@@ -157,6 +159,7 @@ class WebSQL {
                   transaction.executeSql(dropTablesQuery, null, () => {
                     resolve();
                   }, (e) => {
+                    console.error(e);
                     reject(e);
                   });
                 });
@@ -168,6 +171,7 @@ class WebSQL {
               this.version = null;
               console.log(`WebSQL: reset: done.`);
             }).catch( (e) => {
+              console.error(e);
               reject(e);
             });
           } else {
@@ -175,6 +179,7 @@ class WebSQL {
             console.log(`WebSQL: reset: done.`);
           }
         }).catch( (e) => {
+          console.error(e);
           reject(e);
         });
     });

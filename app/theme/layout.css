@@ -65,3 +65,7 @@ body, #app {
   transform: rotate3d(0,1,0, 90deg) !important;
   transition: transform .36s ease-in !important;
 }
+
+.LoginSwipe .Select-placeholder {
+  padding: 8px 52px 8px 32px;
+}

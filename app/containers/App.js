@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { doLogout } from '../actions/appUserActions';
+import { initialize, doLogout } from '../actions/appUserActions';
 import { pageRouterBack } from '../actions/pageRouterActions';
 import { AppCanvas } from 'material-ui';
 import Login from './Login';
@@ -37,7 +37,8 @@ var App = React.createClass({
   },
 
   componentWillMount() {
-    if (window) window.toggleAppNav = this.toggleAppNav;
+    this.props.dispatch(initialize());
+
     if (window) window.toggleAppNav = this.toggleAppNav;
 
     var self = this;
