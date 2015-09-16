@@ -115,6 +115,9 @@ export const setOrganization = createAction('APP_USER_LOGIN_SET_ORGANIZATION');
 export const doSetOrganization = (data) => dispatch => {
   var { orgCode, depCode, year } = data;
 
+  var sendData = { unconfirmed_organization_code: orgCode, unconfirmed_department_code: depCode, unconfirmed_started_year: year };
+  colorgyAPI.request({ method: 'PATCH', url: '/me', json: true, body: { user: sendData } });
+
   dispatch(setOrganization(data));
   dispatch(appUserInitialDataUpdateDone());
 };

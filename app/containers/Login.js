@@ -92,10 +92,10 @@ var Login = React.createClass({
       for (let i=currentYear; i>(currentYear-12); i--) yearOptions.push({ value: i, label: `${i} 年` });
 
       content = (<CenteredPage>
-        <Card zDepth={1} style={{ display: 'block', width: 'auto', height: 'auto', minWidth: 288 }}>
+        <Card zDepth={1} style={{ display: 'block', margin: 12, width: 'auto', height: 'auto', minWidth: 288 }}>
           <CardTitle
             title="選擇學校"
-            subtitle="請選擇您的學校與科系" />
+            subtitle={ this.props.appUserName ? `嗨，${this.props.appUserName}，歡迎您的初次使用！請先選擇您的學校與科系。` : `哈囉，歡迎您的初次使用！請先選擇您的學校與科系。`} />
           <CardText>
             <p>
               <Select
@@ -129,6 +129,7 @@ var Login = React.createClass({
           <CardActions>
             <FlatButton label="確定並繼續" primary={true} onTouchTap={this._handleOrganizationSet} />
           </CardActions>
+          <input ref="fInput" style={{ height: 0, width: 0, opacity: 0 }} />
         </Card>
       </CenteredPage>);
 
@@ -212,23 +213,46 @@ var Login = React.createClass({
   _handleOrganizationSelect(orgCode) {
     this.setState({ orgCode: orgCode, depCode: null });
     this.props.dispatch(doLoadDepartments(orgCode));
+    this.unfocusAll();
   },
 
   _handleYearSelect(year) {
     this.setState({ year: year });
+    this.unfocusAll();
   },
 
   _handleDepartmentSelect(depCode) {
     this.setState({ depCode: depCode });
+    this.unfocusAll();
   },
 
   _handleOrganizationSet() {
     this.props.dispatch(doSetOrganization({ year: this.state.year, orgCode: this.state.orgCode, depCode: this.state.depCode }));
+  },
+
+  unfocusAll() {
+    React.findDOMNode(this.refs.fInput).focus();
+    setTimeout( () => {
+      React.findDOMNode(this.refs.fInput).focus();
+    }, 100);
+    setTimeout( () => {
+      React.findDOMNode(this.refs.fInput).focus();
+    }, 200);
+    setTimeout( () => {
+      React.findDOMNode(this.refs.fInput).focus();
+    }, 300);
+    setTimeout( () => {
+      React.findDOMNode(this.refs.fInput).focus();
+    }, 500);
+    setTimeout( () => {
+      React.findDOMNode(this.refs.fInput).focus();
+    }, 700);
   }
 
 });
 
 export default connect(state => ({
+  appUserName: state.appUser.name,
   errorCode: state.appUser.errorCode,
   loggingIn: state.appUser.loggingIn,
   organizationDataMissing: state.appUser.organizationDataMissing,
