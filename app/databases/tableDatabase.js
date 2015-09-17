@@ -4,10 +4,10 @@ import courseDatabase from './courseDatabase';
 
 var migartions = {
   '1.0': 'CREATE TABLE user_courses(uuid CHARACTER(255) PRIMARY KEY, user_id INTEGER, course_code CHARACTER(255), course_organization_code CHARACTER(255), year INTEGER, term INTEGER, deleted_at DATETIME, synced_at DATETIME);'
-}
+};
 
 if (window.sqlitePlugin) {
-  var tableDatabase = new WebSQL(null, null, null, migartions, sqlitePlugin, { name: 'table.db', location: 2 });
+  var tableDatabase = new WebSQL(null, null, null, migartions, sqlitePlugin, { name: 'table.db', location: 2, androidDatabaseImplementation: (window.sqlitePluginAndroidDatabaseImplementation || 1) });
 } else {
   var tableDatabase = new WebSQL('table', 'table', 3*1024*1024, migartions);
 }

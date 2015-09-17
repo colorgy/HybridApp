@@ -32,7 +32,7 @@ var App = React.createClass({
     if (this.props.appTabIndex == tabIndex) {
       return { height: '100%' };
     } else {
-      return { display: 'none' }
+      return { display: 'none' };
     }
   },
 
@@ -51,6 +51,9 @@ var App = React.createClass({
       }
     }
     document.addEventListener("backbutton", onBackKeyDown, false);
+
+    var loader = document.getElementById('loader');
+    if (loader) loader.remove();
   },
 
   handleTabChange(tabName) {
@@ -102,6 +105,6 @@ var App = React.createClass({
   }
 });
 
-export default connect(state => ({
+export default connect((state) => ({
   isLogin: state.appUser.isLogin
 }))(App);

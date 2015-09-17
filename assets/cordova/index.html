@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="width: 100%; height: 100%;">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -19,10 +19,34 @@
       script.src = 'main.js';
       head.appendChild(script);
     }
-    document.addEventListener("deviceready", loadApp, false);
+
+    function checkDatabase(callback) {
+      // Check if sqlitePlugin is working
+      window.sqlitePlugin.openDatabase({ name: 'ping.db', location: 2 }, function (db) {
+        // success
+        callback(true);
+      }, function (e) {
+        // retry with another connector
+        window.sqlitePlugin.openDatabase({ name: 'ping.db', location: 2, androidDatabaseImplementation: 2 }, function (db) {
+          // success
+          window.sqlitePluginAndroidDatabaseImplementation = 2;
+          callback(true);
+        }, function (e) {
+          // failed, nullify it
+          window.sqlitePlugin = null;
+          callback(false);
+        });
+      });
+    }
+
+    document.addEventListener("deviceready", function () {
+      checkDatabase(loadApp);
+    }, false);
   </script>
 </head>
-<body>
+
+<body style="width: 100%; height: 100%;">
+  <div id="loader" style="width: 100%; height: 100%; background-image: url('app-screen.png'); background-position: 50% 50%; background-size: contain; background-repeat: no-repeat;"></div>
   <div id="app"><!-- CONTENT --></div>
   <!-- DATA -->
 </body>

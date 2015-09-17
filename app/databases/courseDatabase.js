@@ -10,7 +10,7 @@ var migartions = {
 };
 
 if (window.sqlitePlugin) {
-  var courseDatabase = new WebSQL(null, null, null, migartions, sqlitePlugin, { name: 'course.db', location: 2 });
+  var courseDatabase = new WebSQL(null, null, null, migartions, sqlitePlugin, { name: 'course.db', location: 2, androidDatabaseImplementation: (window.sqlitePluginAndroidDatabaseImplementation || 1) });
 } else {
   var courseDatabase = new WebSQL('course', 'course', 3*1024*1024, migartions);
 }

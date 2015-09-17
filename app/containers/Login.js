@@ -251,7 +251,7 @@ var Login = React.createClass({
 
 });
 
-export default connect(state => ({
+export default connect((state) => ({
   appUserName: state.appUser.name,
   errorCode: state.appUser.errorCode,
   loggingIn: state.appUser.loggingIn,

@@ -9,10 +9,10 @@ var migartions = {
   '2.2': 'CREATE TABLE departments(ID INTEGER PRIMARY KEY, organization_code CHARACTER(255), code CHARACTER(255), name CHARACTER(255), short_name CHARACTER(255));',
   '2.2.1': 'CREATE INDEX departments_code_index ON departments (code);',
   '2.2.2': 'CREATE INDEX departments_organization_code_index ON departments (organization_code);'
-}
+};
 
 if (window.sqlitePlugin) {
-  var organizationDatabase = new WebSQL(null, null, null, migartions, sqlitePlugin, { name: 'organization.db', location: 2 });
+  var organizationDatabase = new WebSQL(null, null, null, migartions, sqlitePlugin, { name: 'organization.db', location: 2, androidDatabaseImplementation: (window.sqlitePluginAndroidDatabaseImplementation || 1) });
 } else {
   var organizationDatabase = new WebSQL('organization', 'organization', 3*1024*1024, migartions);
 }
