@@ -15,6 +15,7 @@ var MyCoursesPage = React.createClass({
   componentWillBeVisibleOnPageRouter() {
     this.props.dispatch(doSyncUserCourses());
     this.props.dispatch(doLoadTableCourses());
+    if (window.analytics) window.analytics.trackView('My Courses Page');
   },
 
   getMyCourseCards() {

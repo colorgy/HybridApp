@@ -14,6 +14,7 @@ var CoursesPage = React.createClass({
   componentWillBeVisibleOnPageRouter() {
     this.props.dispatch(doSyncUserCourses());
     this.props.dispatch(doLoadTableCourses());
+    if (window.analytics) window.analytics.trackView('Coursess Page');
 
     if (!this.state.searchQuery) {
       React.findDOMNode(this.refs.searchInput).focus();

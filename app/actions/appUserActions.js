@@ -78,6 +78,8 @@ export const syncAppUserData = (initial = false) => dispatch => {
         dispatch(doAppUserOrganizationDataMissing());
       }
     }
+    if (window.analytics) analytics.setUserId(response.body.id);
+    if (window.ga) ga('set', '&uid', response.body.id);
   })
     .catch( reason => {
       console.error(reason);
@@ -134,6 +136,8 @@ export const doLogout = payload => dispatch => {
   dispatch(logout());
   courseDatabase.reset();
   tableDatabase.reset();
+  if (window.analytics) analytics.setUserId(null);
+  if (window.ga) ga('set', '&uid', null);
 };
 
 export const logout = createAction('LOGOUT');

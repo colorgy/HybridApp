@@ -10,6 +10,10 @@ import CenteredPage from '../components/CenteredPage';
 var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
 var Login = React.createClass({
+  componentDidMount() {
+    if (window.analytics) window.analytics.trackView('Login');
+  },
+
   getInitialState() {
     return {};
   },

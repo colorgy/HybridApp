@@ -122,6 +122,7 @@ var PageRouter = React.createClass({
   },
 
   routeDidUpdate() {
+    var currentPath = (history && history[history.length - 1]) || '/';
 
     if (this.preloading) {
       this.preloading = false;
@@ -137,6 +138,12 @@ var PageRouter = React.createClass({
         if (currentPage.refs && currentPage.refs.wrappedInstance && typeof currentPage.refs.wrappedInstance.componentWillBeVisibleOnPageRouter === 'function') currentPage.refs.wrappedInstance.componentWillBeVisibleOnPageRouter();
       }
     }, this.transitionTime || 1);
+
+    if (window.ga) {
+      ga('send', 'pageview', {
+        'page': currentPath
+      });
+    }
   },
 
   componentDidMount() {

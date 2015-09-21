@@ -5,6 +5,11 @@ import PageWithBar from '../../components/PageWithBar';
 import CenteredPage from '../../components/CenteredPage';
 
 export default React.createClass({
+
+  componentWillBeVisibleOnPageRouter() {
+    if (window.analytics) window.analytics.trackView('About Projects');
+  },
+
   render() {
     return (
       <PageWithBar title="各專案計畫" hasBack pageRouterkey="about" style={this.props.style}>

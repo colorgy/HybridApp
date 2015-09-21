@@ -17,9 +17,10 @@ case "$TARGET" in
 
     cd cordova
     if [ ! -d "/tmp/phonegap-facebook-plugin" ]; then
-      git clone https://github.com/Wizcorp/phonegap-facebook-plugin.git /tmp/phonegap-facebook-plugin --depth=5
+      git clone https://github.com/Neson/phonegap-facebook-plugin.git /tmp/phonegap-facebook-plugin --depth=5
     fi
     cordova -d plugin add /tmp/phonegap-facebook-plugin --variable APP_ID="752440461479659" --variable APP_NAME="Colorgy"
+    cordova plugin add cordova-plugin-google-analytics@0.7.1
 
     if [ "$TARGET" == 'ios' ] || [ "$TARGET" == '' ]; then
       cordova platform add ios

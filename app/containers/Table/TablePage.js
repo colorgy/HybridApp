@@ -17,6 +17,7 @@ var TablePage = React.createClass({
   componentWillBeVisibleOnPageRouter() {
     this.props.dispatch(doSyncUserCourses());
     this.props.dispatch(doLoadTableCourses());
+    if (window.analytics) window.analytics.trackView('Table Page');
   },
 
   render() {
