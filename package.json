@@ -8,7 +8,8 @@
   "scripts": {
     "start": "reapp-run",
     "build": "./bin/build $1",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint app ; exit 0"
   },
   "author": "",
   "license": "ISC",
@@ -46,6 +47,56 @@
     "url-pattern": "^0.10.0"
   },
   "devDependencies": {
+    "eslint": "^1.4.3",
     "redux-devtools": "^1.1.0"
+  },
+  "eslintConfig": {
+    "ecmaFeatures": {
+      "modules": true,
+      "jsx": true,
+      "experimentalObjectRestSpread": true
+    },
+    "env": {
+      "browser": true,
+      "node": true,
+      "es6": true
+    },
+    "rules": {
+      "no-cond-assign": 2,
+      "no-dupe-args": 2,
+      "no-dupe-keys": 2,
+      "no-duplicate-case": 2,
+      "no-empty": 2,
+      "no-extra-boolean-cast": 2,
+      "no-extra-parens": 1,
+      "no-extra-semi": 2,
+      "no-func-assign": 2,
+      "no-sparse-arrays": 2,
+      "no-unreachable": 1,
+      "use-isnan": 2,
+      "valid-jsdoc": 1,
+      "valid-typeof": 2,
+      "curly": 1,
+      "complexity": 1,
+      "brace-style": [
+        1,
+        "1tbs"
+      ],
+      "key-spacing": 2,
+      "semi": [
+        2,
+        "always"
+      ],
+      "object-curly-spacing": [
+        2,
+        "always"
+      ],
+      "arrow-spacing": 2,
+      "arrow-parens": [
+        2,
+        "always"
+      ],
+      "strict": 0
+    }
   }
 }

@@ -191,7 +191,7 @@ class WebSQL {
     } else if (value === false) {
       return 0;
     } else if (typeof value === "string") {
-      return "'" + value.replace("'", "''") + "'";
+      return "'" + value.replace(/'/g, "''") + "'";
     } else if (typeof value === "number") {
       return value;
     } else {
